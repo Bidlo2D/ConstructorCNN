@@ -3,20 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ConstructorCNN"
-        xmlns:LibraryCNN="clr-namespace:LibraryCNN;assembly=LibraryCNN" xmlns:System="clr-namespace:System;assembly=System.Runtime" x:Class="ConstructorCNN.MainWindow"
-        mc:Ignorable="d" Height="690" Width="1402" ResizeMode="CanResizeWithGrip" WindowStyle="None" WindowStartupLocation="CenterScreen" Background="{x:Null}" AllowsTransparency="True" Opacity="0.92" FontSize="18" FontFamily="Comic Sans MS" FontWeight="Bold">
-    <Grid x:Name="Main" Opacity="0.95">
-        <Grid.Background>
-            <ImageBrush ImageSource="/BackGroundCNN.jpg" Stretch="UniformToFill" Opacity="0.95"/>
-        </Grid.Background>
+        xmlns:ch="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:oxy="http://oxyplot.org/wpf"
+        x:Class="ConstructorCNN.MainWindow"
+    mc:Ignorable="d" Height="690" Width="1402" ResizeMode="CanResizeWithGrip" WindowStyle="None" WindowStartupLocation="CenterScreen" Background="{x:Null}" AllowsTransparency="True" Opacity="0.92" FontSize="18" FontFamily="Comic Sans MS" FontWeight="Bold">
+    <Grid x:Name="Main" Opacity="0.95" Background="#FF7693B0">
         <Grid x:Name="MainConstruct" Margin="0,56,0,0" Background="#FFF0EAEA" Opacity="0.95">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="19*"/>
                 <ColumnDefinition Width="15*"/>
                 <ColumnDefinition Width="34*"/>
             </Grid.ColumnDefinitions>
-            <Grid Background="#FF2E2B2B" Grid.ColumnSpan="2">
+            <Grid Background="#FF2E2B2B" Grid.ColumnSpan="2" IsEnabled="False">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -27,7 +24,7 @@
                 </Grid.ColumnDefinitions>
                 <Grid Grid.RowSpan="2">
                     <Grid ShowGridLines="True" HorizontalAlignment="Left" Width="60">
-                        <Menu Background="#FF626476" HorizontalAlignment="Center" Width="60">
+                        <Menu Background="#FF494A53" HorizontalAlignment="Center" Width="60">
                             <MenuItem Header="" FontFamily="Comic Sans MS" Width="60" FontSize="16" Height="60" Foreground="Black" BorderBrush="{x:Null}">
                                 <MenuItem.OpacityMask>
                                     <ImageBrush ImageSource="/BlackPlus.png" Stretch="Fill" Opacity="1"/>
@@ -71,9 +68,22 @@
                     <StackPanel x:Name="ParamsFullyStack" Grid.Column="1" Margin="1,0,0,0"/>
                 </Grid>
             </Grid>
-            <TabControl x:Name="PanelData" Grid.Column="2">
+            <TabControl x:Name="Pages" Grid.Column="2">
                 <TabItem Header="Training">
-                    <Grid x:Name="PanelTrain" Background="#FFE5E5E5"/>
+                    <Grid x:Name="PanelTrain" Background="#FFE5E5E5">
+                        <Button Content="Start" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="45" Width="80" Foreground="#FF57CB52" Background="{x:Null}" BorderBrush="Black" Click="Button_Click_3"/>
+                        <Button Content="Stop" HorizontalAlignment="Left" Margin="605,10,0,0" VerticalAlignment="Top" Height="45" Width="80" Foreground="#FF57CB52" Background="{x:Null}" BorderBrush="Black"/>
+                        <ProgressBar x:Name="EpothsProgress" HorizontalAlignment="Center" Height="25" Margin="0,60,0,0" VerticalAlignment="Top" Width="675"/>
+                        <ProgressBar x:Name="DataProgress" HorizontalAlignment="Center" Height="25" Margin="0,90,0,0" VerticalAlignment="Top" Width="675"/>
+                        <RichTextBox Margin="95,10,95,0" Height="45" VerticalAlignment="Top">
+                            <FlowDocument>
+                                <Paragraph>
+                                    <Run Text="RichTextBox"/>
+                                </Paragraph>
+                            </FlowDocument>
+                        </RichTextBox>
+                        <oxy:PlotView Margin="10,120,10,10"></oxy:PlotView>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Testing">
                     <Grid x:Name="PanelTesting" Background="#FFE5E5E5"/>
@@ -86,5 +96,6 @@
         <Button x:Name="RollUp" Content="-" HorizontalAlignment="Right" Margin="0,5,105,0" Width="46" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" FontFamily="Comic Sans MS" FontSize="20" FontWeight="Bold" Click="Button_Click" Height="43" VerticalAlignment="Top"/>
         <Image HorizontalAlignment="Left" Height="56" VerticalAlignment="Top" Width="64" Source="/IconeCNN.png" Stretch="Fill" StretchDirection="Both"/>
         <Label Content="Welcome to the Construct CNN!" Margin="76,10,0,0" Foreground="White" FontSize="18" FontFamily="Comic Sans MS" FontWeight="Bold" FontStyle="Normal" BorderThickness="0,0,0,2" BorderBrush="White" HorizontalAlignment="Left" Width="300" Height="33" VerticalAlignment="Top"/>
+        <WrapPanel/>
     </Grid>
 </Window>

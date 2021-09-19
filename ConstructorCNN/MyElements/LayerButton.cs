@@ -33,6 +33,7 @@ namespace ConstructorCNN
         }
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
+            Network.Remove(Layer);
             Add.Children.Remove(this);
         }
         protected override void OnClick()
@@ -49,9 +50,9 @@ namespace ConstructorCNN
             Label nameValue = new Label();
             nameValue.Content = Content;
             paramsPanel.Children.Add(nameValue);
-            PropertyInfo[] a = Layer.GetType().GetProperties();
             foreach (var field in Layer.GetType().GetProperties())
             {
+                if (!field.CanRead) { continue; }
                 //Header
                 Label nameProp = new Label(); 
                 nameProp.Content = field.Name;
@@ -61,7 +62,7 @@ namespace ConstructorCNN
                     || field.GetValue(Layer).GetType() == typeof(bool))
                 {
                     ComboBoxEnum comboValue = new ComboBoxEnum(field.GetValue(Layer), field.Name, Layer);
-                    comboValue.IsEnabled = field.CanWrite ? true : false; 
+                    comboValue.IsEnabled = field.CanWrite ? true : false;
                     paramsPanel.Children.Add(comboValue);
                 }
                 else

@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using LibraryCNN.Other;
 using LibraryCNN;
+using OxyPlot;
+using OxyPlot.Series;
 
 namespace ConstructorCNN
 {
@@ -23,13 +12,13 @@ namespace ConstructorCNN
     public partial class MainWindow : Window
     {
         bool statusWin = true;
-        Network Net = new Network();
         int conv, fully;
         public MainWindow()
         {
             InitializeComponent();
             OnCreateLayer(new FullyConnectClassifier(), StackFully, InfoGridFully, ref fully, 0, false);
             OnCreateLayer(new FullyConnectInput(), StackFully, InfoGridFully, ref fully, 0, false);
+            
         }
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
@@ -67,10 +56,16 @@ namespace ConstructorCNN
             OnCreateLayer(new FullyConnectLayer(), StackFully, InfoGridFully, ref fully);
         }
 
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private void OnCreateLayer(AbLayer layer, StackPanel AddStack, Grid info, ref int counter, int index = 1, bool Fdelete = true)
         {
             LayerButton element = new LayerButton(layer, info, AddStack, counter, Fdelete);//Element
             AddStack.Children.Insert(index, element);//Add elemet to stack
+            Network.Add(layer);
             counter++;
         }
     }
