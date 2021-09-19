@@ -24,10 +24,12 @@ namespace ConstructorCNN
     {
         bool statusWin = true;
         Network Net = new Network();
-        int cvB, cv, po, fuB, fu;
+        int conv, fully;
         public MainWindow()
         {
             InitializeComponent();
+            OnCreateLayer(new FullyConnectClassifier(), StackFully, InfoGridFully, ref fully, 0, false);
+            OnCreateLayer(new FullyConnectInput(), StackFully, InfoGridFully, ref fully, 0, false);
         }
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
@@ -46,38 +48,30 @@ namespace ConstructorCNN
         }
         private void Button_Click_ConvBias(object sender, RoutedEventArgs e)
         {
-            ConvalutionLayerBias layer = new ConvalutionLayerBias();//Layer
-            LayerButton element = new LayerButton(layer, InfoGridConv, fuB);//Element
-            StackConv.Children.Add(element);//Add elemet to stack
-            cvB++;
+            OnCreateLayer(new ConvalutionLayerBias(), StackConv, InfoGridConv, ref conv, 0);
         }
         private void Button_Click_ConvNoBias(object sender, RoutedEventArgs e)
         {
-            ConvalutionLayer layer = new ConvalutionLayer();//Layer
-            LayerButton element = new LayerButton(layer, InfoGridConv, fuB);//Element
-            StackConv.Children.Add(element);//Add elemet to stack
-            cv++;
+            OnCreateLayer(new ConvalutionLayer(), StackConv, InfoGridConv, ref conv, 0);
         }
         private void Button_Click_Pooling(object sender, RoutedEventArgs e)
         {
-            PoolingLayer layer = new PoolingLayer();//Layer
-            LayerButton element = new LayerButton(layer, InfoGridConv, fuB);//Element
-            StackConv.Children.Add(element);//Add elemet to stack
-            po++;
+            OnCreateLayer(new PoolingLayer(), StackConv, InfoGridConv, ref conv, 0);
         }
         private void Button_Click_FullyBias(object sender, RoutedEventArgs e)
         {
-            FullyConnectBias layer = new FullyConnectBias();//Layer
-            LayerButton element = new LayerButton(layer, InfoGridFully, fuB);//Element
-            StackFully.Children.Add(element);//Add elemet to stack
-            fuB++;
+            OnCreateLayer(new FullyConnectBias(), StackFully, InfoGridFully, ref fully);
         }
         private void Button_Click_FullyNoBias(object sender, RoutedEventArgs e)
         {
-            FullyConnectLayer layer = new FullyConnectLayer();//Layer
-            LayerButton element = new LayerButton(layer, InfoGridFully, fuB);//Element
-            StackFully.Children.Add(element);//Add elemet to stack
-            fu++;
+            OnCreateLayer(new FullyConnectLayer(), StackFully, InfoGridFully, ref fully);
+        }
+
+        private void OnCreateLayer(AbLayer layer, StackPanel AddStack, Grid info, ref int counter, int index = 1, bool Fdelete = true)
+        {
+            LayerButton element = new LayerButton(layer, info, AddStack, counter, Fdelete);//Element
+            AddStack.Children.Insert(index, element);//Add elemet to stack
+            counter++;
         }
     }
 }
