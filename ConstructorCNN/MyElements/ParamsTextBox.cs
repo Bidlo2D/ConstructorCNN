@@ -20,19 +20,16 @@ namespace ConstructorCNN
         }
         protected override void OnTextChanged(TextChangedEventArgs e)
         {
-/*            if (!String.IsNullOrWhiteSpace(Text))
+            if (!String.IsNullOrEmpty(Text))
             {
-                Text = Text.Replace(" ", "");
-                Network.Epoth = Convert.ToInt32(Text);
-                CaretIndex = Text.Length;
-            }*/
-            if (!String.IsNullOrEmpty(Text)) {
                 foreach (var field in layerData.GetType().GetProperties())
                 {
-                    if(field.Name == dataName && field.CanWrite)
+                    if (field.Name == dataName && field.CanWrite)
                     {
                         object newData = Convert.ChangeType(Text, field.GetValue(layerData).GetType());
-                        field.SetValue(layerData, newData);
+                        //field.SetValue(layerData, newData);
+                        try { field.SetValue(layerData, newData); }
+                        catch (OverflowException) { field.SetValue(layerData, default); }
                         break;
                     }
                 }
