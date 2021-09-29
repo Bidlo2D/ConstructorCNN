@@ -1,7 +1,5 @@
 ﻿using LibraryCNN;
 using System.Windows.Controls;
-using System.Reflection;
-using System.Windows.Markup;
 using System.Windows;
 
 namespace ConstructorCNN
@@ -12,7 +10,6 @@ namespace ConstructorCNN
         Panel controlInfo { get; set; }
         StackPanel Add { get; set; }
         bool Delete { get; set; }
-
         public LayerButton(AbLayer layer, Grid control, StackPanel add, int count, bool delete) : base() 
         {
             Content = $"{layer.GetType().Name}#{count}";

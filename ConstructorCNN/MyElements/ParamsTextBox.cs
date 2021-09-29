@@ -2,6 +2,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace ConstructorCNN
@@ -19,6 +20,12 @@ namespace ConstructorCNN
         }
         protected override void OnTextChanged(TextChangedEventArgs e)
         {
+/*            if (!String.IsNullOrWhiteSpace(Text))
+            {
+                Text = Text.Replace(" ", "");
+                Network.Epoth = Convert.ToInt32(Text);
+                CaretIndex = Text.Length;
+            }*/
             if (!String.IsNullOrEmpty(Text)) {
                 foreach (var field in layerData.GetType().GetProperties())
                 {
@@ -29,6 +36,15 @@ namespace ConstructorCNN
                         break;
                     }
                 }
+            }
+        }
+        protected override void OnTextInput(TextCompositionEventArgs e)
+        {
+            char number = Convert.ToChar(e.Text);
+            if (Char.IsDigit(number))
+            {
+                Text += number;
+                CaretIndex = Text.Length;
             }
         }
     }

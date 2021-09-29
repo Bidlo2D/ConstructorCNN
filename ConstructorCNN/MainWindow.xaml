@@ -3,9 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ch="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:oxy="http://oxyplot.org/wpf"
-        x:Class="ConstructorCNN.MainWindow"
-    mc:Ignorable="d" Height="690" Width="1402" ResizeMode="CanResizeWithGrip" WindowStyle="None" WindowStartupLocation="CenterScreen" Background="{x:Null}" AllowsTransparency="True" Opacity="0.92" FontSize="18" FontFamily="Comic Sans MS" FontWeight="Bold">
+        xmlns:ch="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:oxy="http://oxyplot.org/wpf" xmlns:local="clr-namespace:ConstructorCNN"
+    x:Class="ConstructorCNN.MainWindow"
+    mc:Ignorable="d" Height="892" Width="1402" ResizeMode="CanResizeWithGrip" WindowStyle="None" WindowStartupLocation="CenterScreen" Background="{x:Null}" AllowsTransparency="True" Opacity="0.92" FontSize="18" FontFamily="Comic Sans MS" FontWeight="Bold">
+    <Window.DataContext>
+        <local:LossViewModel/>
+    </Window.DataContext>
     <Grid x:Name="Main" Opacity="0.95" Background="#FF7693B0">
         <Grid x:Name="MainConstruct" Margin="0,56,0,0" Background="#FFF0EAEA" Opacity="0.95">
             <Grid.ColumnDefinitions>
@@ -13,7 +16,7 @@
                 <ColumnDefinition Width="15*"/>
                 <ColumnDefinition Width="34*"/>
             </Grid.ColumnDefinitions>
-            <Grid Background="#FF2E2B2B" Grid.ColumnSpan="2" IsEnabled="False">
+            <Grid ch:Name="ConstructNetGrid" Background="#FF2E2B2B" Grid.ColumnSpan="2">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -71,24 +74,41 @@
             <TabControl x:Name="Pages" Grid.Column="2">
                 <TabItem Header="Training">
                     <Grid x:Name="PanelTrain" Background="#FFE5E5E5">
-                        <Button Content="Start" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="45" Width="80" Foreground="#FF57CB52" Background="{x:Null}" BorderBrush="Black" Click="Button_Click_3"/>
-                        <Button Content="Stop" HorizontalAlignment="Left" Margin="605,10,0,0" VerticalAlignment="Top" Height="45" Width="80" Foreground="#FF57CB52" Background="{x:Null}" BorderBrush="Black"/>
-                        <ProgressBar x:Name="EpothsProgress" HorizontalAlignment="Center" Height="25" Margin="0,60,0,0" VerticalAlignment="Top" Width="675"/>
-                        <ProgressBar x:Name="DataProgress" HorizontalAlignment="Center" Height="25" Margin="0,90,0,0" VerticalAlignment="Top" Width="675"/>
-                        <RichTextBox Margin="95,10,95,0" Height="45" VerticalAlignment="Top">
-                            <FlowDocument>
-                                <Paragraph>
-                                    <Run Text="RichTextBox"/>
-                                </Paragraph>
-                            </FlowDocument>
-                        </RichTextBox>
-                        <oxy:PlotView Margin="10,120,10,10"></oxy:PlotView>
+                        <Button Content="Start" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="50" Width="80" Foreground="#FF57CB52" Background="{x:Null}" BorderBrush="Black" Click="Button_Start"/>
+                        <Button Content="Stop" HorizontalAlignment="Right" Margin="0,65,605,0" VerticalAlignment="Top" Height="49" Width="80" Foreground="#FFEC3D3D" Background="{x:Null}" BorderBrush="Black" Click="Button_Stop"/>
+                        <ProgressBar x:Name="DataProgress" HorizontalAlignment="Center" Height="20" Margin="0,179,0,0" VerticalAlignment="Top" Width="675" BorderBrush="Black"/>
+                        <oxy:Plot ch:Name="ChartsLoss" Title="{Binding Title}" Margin="10,204,10,10">
+                            <oxy:Plot.Series>
+                                <oxy:LineSeries ItemsSource="{Binding Points}"/>
+                            </oxy:Plot.Series>
+                        </oxy:Plot>
+                        <TextBox ch:Name="EpothsText" HorizontalAlignment="Left" Margin="100,124,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="80" Height="25" PreviewTextInput="TextBox_EpothTextInput" TextChanged="TextBox_EpothChanged" Text="100" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1"/>
+                        <Label Content="Epoths -" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top" Width="90" RenderTransformOrigin="0.5,0.197"/>
+                        <TextBox ch:Name="StatusBox" HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="505" Height="104" TextAlignment="Center" IsReadOnly="True"/>
+                        <Button ch:Name="LoadB" Content="Load" HorizontalAlignment="Left" Margin="605,12,0,0" VerticalAlignment="Top" Height="50" Width="80" Foreground="Black" Background="{ch:Null}" BorderBrush="Black" Click="Load_Click"/>
+                        <Button ch:Name="SaveB" Content="Save" HorizontalAlignment="Left" Margin="605,65,0,0" VerticalAlignment="Top" Height="50" Width="80" Foreground="Black" Background="{ch:Null}" BorderBrush="Black" Click="Save_Click"/>
+                        <ProgressBar ch:Name="EpothProgress" HorizontalAlignment="Center" Height="20" Margin="0,154,0,0" VerticalAlignment="Top" Width="675" BorderBrush="Black"/>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Testing">
                     <Grid x:Name="PanelTesting" Background="#FFE5E5E5"/>
                 </TabItem>
-                <TabItem Header="Data"/>
+                <TabItem Header="Data">
+                    <Grid x:Name="PanelData" Background="#FFE5E5E5">
+                        <TextBox HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="465" Height="29"/>
+                        <Button ch:Name="BrowseB" Content="Browse" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Click="Button_Browse"/>
+                        <ScrollViewer ch:Name="ScrollImages" Margin="10,44,10,21" BorderBrush="#FF5D5050">
+                            <ScrollViewer.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FFDAD0D0"/>
+                                    <GradientStop Color="White" Offset="1"/>
+                                </LinearGradientBrush>
+                            </ScrollViewer.Background>
+                            <StackPanel ch:Name="StackImages"/>
+                        </ScrollViewer>
+                        <Button ch:Name="ClearData" Content="Clear data" HorizontalAlignment="Left" Margin="585,10,0,0" VerticalAlignment="Top" Width="100" Click="Button_Clear"/>
+                    </Grid>
+                </TabItem>
             </TabControl>
         </Grid>
         <Button x:Name="Exit" Content="X" HorizontalAlignment="Right" Width="45" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" FontFamily="Comic Sans MS" FontSize="20" FontWeight="Bold" Click="Button_Click_1" Height="43" VerticalAlignment="Top" Margin="0,6,6,0"/>
@@ -96,6 +116,5 @@
         <Button x:Name="RollUp" Content="-" HorizontalAlignment="Right" Margin="0,5,105,0" Width="46" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" FontFamily="Comic Sans MS" FontSize="20" FontWeight="Bold" Click="Button_Click" Height="43" VerticalAlignment="Top"/>
         <Image HorizontalAlignment="Left" Height="56" VerticalAlignment="Top" Width="64" Source="/IconeCNN.png" Stretch="Fill" StretchDirection="Both"/>
         <Label Content="Welcome to the Construct CNN!" Margin="76,10,0,0" Foreground="White" FontSize="18" FontFamily="Comic Sans MS" FontWeight="Bold" FontStyle="Normal" BorderThickness="0,0,0,2" BorderBrush="White" HorizontalAlignment="Left" Width="300" Height="33" VerticalAlignment="Top"/>
-        <WrapPanel/>
     </Grid>
 </Window>
