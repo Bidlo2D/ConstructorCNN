@@ -23,9 +23,9 @@ namespace ConstructorCNN
         public MainWindow()
         {
             InitializeComponent();
+            Converter.DirImagesToTensor(@"C:\Games\Programs\Fonts\alphabet");
             OnCreateLayerIndex(new FullyConnectClassifier(), StackFully, InfoGridFully, ref fully, 0, false);
             OnCreateLayerIndex(new FullyConnectInput(), StackFully, InfoGridFully, ref fully, 0, false);
-            Converter.DirImagesToTensor(@"C:\Games\Programs\Fonts\alphabet");
         }
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
@@ -42,21 +42,15 @@ namespace ConstructorCNN
         }
         private void Button_Click_ConvBias(object sender, RoutedEventArgs e)
         {
-            if(Network.CountConv == 0) { 
-                OnCreateLayerIndex(new ConvalutionLayerBias(), StackConv, InfoGridConv, ref conv, 0); }
-            else { OnCreateLayerIndex(new ConvalutionLayerBias(), StackConv, InfoGridConv, ref conv, 1); }
+            OnCreateLayerAdd(new ConvalutionLayerBias(), StackConv, InfoGridConv, ref conv);
         }
         private void Button_Click_ConvNoBias(object sender, RoutedEventArgs e)
         {
-            if (Network.CountConv == 0){
-                OnCreateLayerIndex(new ConvalutionLayer(), StackConv, InfoGridConv, ref conv, 0); }
-            else { OnCreateLayerIndex(new ConvalutionLayer(), StackConv, InfoGridConv, ref conv, 1); }
+            OnCreateLayerAdd(new ConvalutionLayer(), StackConv, InfoGridConv, ref conv);
         }
         private void Button_Click_Pooling(object sender, RoutedEventArgs e)
         {
-            if (Network.CountConv == 0){
-                OnCreateLayerIndex(new PoolingLayer(), StackConv, InfoGridConv, ref conv, 0); }
-            else { OnCreateLayerIndex(new PoolingLayer(), StackConv, InfoGridConv, ref conv, 1); }
+            OnCreateLayerAdd(new PoolingLayer(), StackConv, InfoGridConv, ref conv);
         }
         private void Button_Click_FullyBias(object sender, RoutedEventArgs e)
         {
@@ -78,6 +72,13 @@ namespace ConstructorCNN
             LayerButton element = new LayerButton(layer, info, AddStack, counter, Fdelete);//Element
             AddStack.Children.Add(element);//Add elemet to stack
             Network.Add(layer);
+            counter++;
+        }
+        private void OnCreateLayerLoad(AbLayer layer, StackPanel AddStack, Grid info, ref int counter, bool Fdelete = true)
+        {
+            LayerButton element = new LayerButton(layer, info, AddStack, counter, Fdelete);//Element
+            AddStack.Children.Add(element);//Add elemet to stack
+            Network.Load(layer);
             counter++;
         }
         private void Button_Start(object sender, RoutedEventArgs e)
@@ -119,6 +120,7 @@ namespace ConstructorCNN
                         if (Network.Answer == image.Right) { CountRight++; }
                         Dispatcher.Invoke(new Action(() =>
                         { DataProgress.Value++; }));
+                        if (stoped) { break; }
                     }
                     //Status by one epoch
                     Dispatcher.Invoke(new Action(() =>
@@ -213,17 +215,11 @@ namespace ConstructorCNN
                             if (item.GetType() == typeof(ConvalutionLayer)
                                 || item.GetType().BaseType == typeof(ConvalutionLayer))
                             {
-                                if (Network.CountConv == 0){
-                                    OnCreateLayerIndex(item, StackConv, InfoGridConv, ref conv, 0); }
-                                else { OnCreateLayerIndex(item, StackConv, InfoGridConv, ref conv, 1); }
+                                OnCreateLayerLoad(item, StackConv, InfoGridConv, ref conv);
                             }
                             else
                             {
-                                if (item.GetType() == typeof(FullyConnectInput))
-                                { OnCreateLayerIndex(item, StackFully, InfoGridFully, ref fully, 0); }
-                                else if(item.GetType() == typeof(FullyConnectClassifier)) 
-                                { OnCreateLayerAdd(item, StackFully, InfoGridFully, ref fully); }
-                                else { OnCreateLayerIndex(item, StackFully, InfoGridFully, ref fully, 1); }
+                                OnCreateLayerLoad(item, StackFully, InfoGridFully, ref fully);
                             }
                         }
                     }

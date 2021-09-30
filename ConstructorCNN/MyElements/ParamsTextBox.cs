@@ -17,8 +17,9 @@ namespace ConstructorCNN
             dataName = name;
             layerData = layer;
             Text = data.ToString();
+            TextChanged += TextBox_EpothChanged;
         }
-        protected override void OnTextChanged(TextChangedEventArgs e)
+        private void TextBox_EpothChanged(object sender, TextChangedEventArgs e)
         {
             if (!String.IsNullOrEmpty(Text))
             {
@@ -38,7 +39,7 @@ namespace ConstructorCNN
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
             char number = Convert.ToChar(e.Text);
-            if (Char.IsDigit(number))
+            if (Char.IsDigit(number) && !(Text.Length >= 4))
             {
                 Text += number;
                 CaretIndex = Text.Length;

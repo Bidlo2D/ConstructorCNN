@@ -30,6 +30,7 @@ namespace ConstructorCNN
                 }
                 SelectedItem = data.ToString();
             }
+            SelectionChanged += ComboBox_SelectionChanged;
         }
         private T dosomething<T>(object o)
         {
@@ -55,5 +56,24 @@ namespace ConstructorCNN
                 }
             }
         }
+/*        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach (var field in layerData.GetType().GetProperties())
+            {
+                if (field.Name == dataName && field.CanWrite)
+                {
+                    if (field.GetValue(layerData).GetType() == typeof(bool))
+                    {
+                        field.SetValue(layerData, Convert.ToBoolean(SelectedValue));
+                    }
+                    else
+                    {
+                        Enum.TryParse(field.GetValue(layerData).GetType(), SelectedValue.ToString(), out object newData);
+                        field.SetValue(layerData, newData);
+                    }
+                    break;
+                }
+            }
+        }*/
     }
 }

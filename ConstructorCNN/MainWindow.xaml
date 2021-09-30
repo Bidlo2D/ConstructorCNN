@@ -75,8 +75,8 @@
                 <TabItem Header="Training">
                     <Grid x:Name="PanelTrain" Background="#FFE5E5E5">
                         <Button Content="Start" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="50" Width="80" Foreground="#FF57CB52" Background="{x:Null}" BorderBrush="Black" Click="Button_Start"/>
-                        <Button Content="Stop" HorizontalAlignment="Right" Margin="0,65,605,0" VerticalAlignment="Top" Height="49" Width="80" Foreground="#FFEC3D3D" Background="{x:Null}" BorderBrush="Black" Click="Button_Stop"/>
-                        <ProgressBar x:Name="DataProgress" HorizontalAlignment="Center" Height="20" Margin="0,179,0,0" VerticalAlignment="Top" Width="675" BorderBrush="Black"/>
+                        <Button Content="Stop" Margin="10,65,0,0" VerticalAlignment="Top" Height="49" Foreground="#FFEC3D3D" Background="{x:Null}" BorderBrush="Black" Click="Button_Stop" HorizontalAlignment="Left" Width="80"/>
+                        <ProgressBar x:Name="DataProgress" Height="20" Margin="10,179,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
                         <oxy:Plot ch:Name="ChartsLoss" Title="{Binding Title}" Margin="10,204,10,10">
                             <oxy:Plot.Series>
                                 <oxy:LineSeries ItemsSource="{Binding Points}"/>
@@ -84,10 +84,10 @@
                         </oxy:Plot>
                         <TextBox ch:Name="EpothsText" HorizontalAlignment="Left" Margin="100,124,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="80" Height="25" PreviewTextInput="TextBox_EpothTextInput" TextChanged="TextBox_EpothChanged" Text="100" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1"/>
                         <Label Content="Epoths -" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top" Width="90" RenderTransformOrigin="0.5,0.197"/>
-                        <TextBox ch:Name="StatusBox" HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="505" Height="104" TextAlignment="Center" IsReadOnly="True"/>
-                        <Button ch:Name="LoadB" Content="Load" HorizontalAlignment="Left" Margin="605,12,0,0" VerticalAlignment="Top" Height="50" Width="80" Foreground="Black" Background="{ch:Null}" BorderBrush="Black" Click="Load_Click"/>
-                        <Button ch:Name="SaveB" Content="Save" HorizontalAlignment="Left" Margin="605,65,0,0" VerticalAlignment="Top" Height="50" Width="80" Foreground="Black" Background="{ch:Null}" BorderBrush="Black" Click="Save_Click"/>
-                        <ProgressBar ch:Name="EpothProgress" HorizontalAlignment="Center" Height="20" Margin="0,154,0,0" VerticalAlignment="Top" Width="675" BorderBrush="Black"/>
+                        <TextBox ch:Name="StatusBox" Margin="95,10,95,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="104" TextAlignment="Center" IsReadOnly="True"/>
+                        <Button ch:Name="LoadB" Content="Load" Margin="0,12,10,0" VerticalAlignment="Top" Height="50" Foreground="Black" Background="{ch:Null}" BorderBrush="Black" Click="Load_Click" HorizontalAlignment="Right" Width="80"/>
+                        <Button ch:Name="SaveB" Content="Save" Margin="0,65,10,0" VerticalAlignment="Top" Height="50" Foreground="Black" Background="{ch:Null}" BorderBrush="Black" Click="Save_Click" HorizontalAlignment="Right" Width="80"/>
+                        <ProgressBar ch:Name="EpothProgress" Height="20" Margin="10,154,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Testing">
