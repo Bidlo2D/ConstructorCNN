@@ -74,7 +74,7 @@
             <TabControl x:Name="Pages" Grid.Column="2">
                 <TabItem Header="Training">
                     <Grid x:Name="PanelTrain" Background="#FFE5E5E5">
-                        <Button Content="Start" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="50" Width="80" Foreground="#FF57CB52" Background="{x:Null}" BorderBrush="Black" Click="Button_Start"/>
+                        <Button Content="Train" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="50" Width="80" Foreground="#FF57CB52" Background="{x:Null}" BorderBrush="Black" Click="Button_Start"/>
                         <Button Content="Stop" Margin="10,65,0,0" VerticalAlignment="Top" Height="49" Foreground="#FFEC3D3D" Background="{x:Null}" BorderBrush="Black" Click="Button_Stop" HorizontalAlignment="Left" Width="80"/>
                         <ProgressBar x:Name="DataProgress" Height="20" Margin="10,179,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
                         <oxy:Plot ch:Name="ChartsLoss" Title="{Binding Title}" Margin="10,204,10,10">
@@ -91,12 +91,27 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="Testing">
-                    <Grid x:Name="PanelTesting" Background="#FFE5E5E5"/>
+                    <Grid x:Name="PanelTesting" Background="#FFE5E5E5">
+                        <TextBox ch:Name="StatusReset" Margin="95,10,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="79" TextAlignment="Center" IsReadOnly="True"/>
+                        <Button ch:Name="ResetB" Content="Reset" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="79" Width="80" Foreground="#FF47C961" Click="Button_Reset" BorderBrush="Black" IsCancel="True"/>
+                        <TextBox HorizontalAlignment="Center" Margin="0,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="465" Height="26" TextChanged="TextBox_TextChanged"/>
+                        <Button ch:Name="BrowseB_Copy" Content="Browse" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="100" Click="Button_Browse_Test" Height="35"/>
+                        <ScrollViewer ch:Name="ScrollImages_Copy" Margin="10,134,10,21" BorderBrush="#FF5D5050">
+                            <ScrollViewer.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FFDAD0D0"/>
+                                    <GradientStop Color="White" Offset="1"/>
+                                </LinearGradientBrush>
+                            </ScrollViewer.Background>
+                            <StackPanel ch:Name="StackImagesTest"/>
+                        </ScrollViewer>
+                        <Button ch:Name="ClearData_Copy" Content="Clear data" HorizontalAlignment="Left" Margin="585,94,0,0" VerticalAlignment="Top" Width="100" Height="35"/>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Data">
                     <Grid x:Name="PanelData" Background="#FFE5E5E5">
                         <TextBox HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="465" Height="29"/>
-                        <Button ch:Name="BrowseB" Content="Browse" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Click="Button_Browse"/>
+                        <Button ch:Name="BrowseB" Content="Browse" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Click="Button_Browse_Train"/>
                         <ScrollViewer ch:Name="ScrollImages" Margin="10,44,10,21" BorderBrush="#FF5D5050">
                             <ScrollViewer.Background>
                                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

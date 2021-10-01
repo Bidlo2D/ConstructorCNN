@@ -17,15 +17,14 @@ namespace ConstructorCNN
     public partial class MainWindow : Window
     {
         private IList<DataPoint> Points = new List<DataPoint>();
-        private string PathData;
         private bool statusWin = true, stoped;
         private int conv, fully;
         public MainWindow()
         {
             InitializeComponent();
-            Converter.DirImagesToTensor(@"C:\Games\Programs\Fonts\alphabet");
-            OnCreateLayerIndex(new FullyConnectClassifier(), StackFully, InfoGridFully, ref fully, 0, false);
-            OnCreateLayerIndex(new FullyConnectInput(), StackFully, InfoGridFully, ref fully, 0, false);
+            //Converter.DirImagesToTensor(@"C:\Games\Programs\Fonts\alphabet");
+            OnCreateLayerAdd(new FullyConnectInput(), StackFully, InfoGridFully, ref fully, false);
+            OnCreateLayerAdd(new FullyConnectClassifier(), StackFully, InfoGridFully, ref fully, false);
         }
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
@@ -174,19 +173,28 @@ namespace ConstructorCNN
         {
             stoped = true;
         }
-        private void Button_Browse(object sender, RoutedEventArgs e)
+        private void Button_Browse_Train(object sender, RoutedEventArgs e)
+        {
+            BrowseImages(StackImages);
+        }
+        private void Button_Browse_Test(object sender, RoutedEventArgs e)
+        {
+            //TODO: Переделать класс Converter, так чтобы можно было хранить несколько массивов данных
+            BrowseImages(StackImagesTest);
+        }
+        private void BrowseImages(StackPanel panel)
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
-                if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    PathData = dialog.SelectedPath.ToString();
+                    string PathData = dialog.SelectedPath.ToString();
                     Converter.DirImagesToTensor(PathData);
                     foreach (var image in Converter.ImagesPath)
                     {
                         Image im = new Image();
                         im.Source = new BitmapImage(new Uri(image));
-                        StackImages.Children.Add(im);
+                        panel.Children.Add(im);
                     }
                 }
             }
@@ -244,6 +252,42 @@ namespace ConstructorCNN
                     Converter.SaveNet(fs);
                 }
             }
+        }
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox box = (TextBox)sender;
+            try
+            {
+/*                Converter.DirImagesToTensor(box.Text);
+                foreach (var image in Converter.ImagesPath)
+                {
+                    Image im = new Image();
+                    im.Source = new BitmapImage(new Uri(image));
+                    StackImages.Children.Add(im);
+                }*/
+            }
+            catch (Exception ex) { box.Text = $"Путь к директории скорее всего неверно записан.({ex.Message})"; }
+        }
+        private void Button_Reset(object sender, RoutedEventArgs e)
+        {
+            ResetB.IsEnabled = false;
+            new Thread(() => 
+            {
+                int CountRight = 0;
+                foreach (var image in Converter.Images)
+                {
+                    Network.InitializationConv();
+                    Network.InitializationFully();
+                    Network.ForwardNet(image);
+                    if (Network.Answer == image.Right) { CountRight++; }
+                }
+                Dispatcher.Invoke(new Action(() => 
+                {
+                    StatusReset.AppendText($"Count right - {CountRight}\n");
+                    StatusReset.ScrollToEnd();
+                    ResetB.IsEnabled = true;
+                }));
+            }).Start();
         }
         private void TextBox_EpothChanged(object sender, TextChangedEventArgs e)
         {
