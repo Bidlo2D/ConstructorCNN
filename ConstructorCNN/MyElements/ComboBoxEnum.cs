@@ -13,7 +13,6 @@ namespace ConstructorCNN
         public ComboBoxEnum(object data, string name, AbLayer layer) : base() 
         {
             Margin = new Thickness(0, 5, 0, 0);
-            SelectionChanged += ComboBox_SelectionChanged;
             dataName = name;
             layerData = layer;
             if(data.GetType() == typeof(bool))
@@ -30,8 +29,15 @@ namespace ConstructorCNN
                 }
                 SelectedItem = data.ToString();
             }
+            //layerData.ParamsChanged += LayerData_ParamsChanged;
             SelectionChanged += ComboBox_SelectionChanged;
         }
+
+        private void LayerData_ParamsChanged(object sender, EventChangedParams e)
+        {
+            throw new NotImplementedException();
+        }
+
         private T dosomething<T>(object o)
         {
             T enumVal = (T)Enum.Parse(typeof(T), o.ToString());

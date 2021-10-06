@@ -11,6 +11,7 @@ namespace ConstructorCNN
 
         public string Title { get; private set; } = "Loss Function";
 
-        public static IList<DataPoint> Points { get; set; }
+        public static IList<DataPoint> PointsTrain { get; set; }
+        public static IList<DataPoint> PointsTest { get; set; }
     }
 }

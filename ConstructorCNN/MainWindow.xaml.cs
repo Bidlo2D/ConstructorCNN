@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -16,9 +17,10 @@ namespace ConstructorCNN
     /// </summary>
     public partial class MainWindow : Window
     {
-        private IList<DataPoint> Points = new List<DataPoint>();
+        private IList<DataPoint> PointsTest = new List<DataPoint>();
+        private IList<DataPoint> PointsTrain = new List<DataPoint>();
         private bool statusWin = true, stoped;
-        private int conv, fully;
+        private int conv, fully, percent, batchSize;
         public MainWindow()
         {
             InitializeComponent();
@@ -86,14 +88,15 @@ namespace ConstructorCNN
             On_Off(false, b, ConstructNetGrid);
             stoped = false;
             StatusBox.Clear();
-            Points.Clear();
+            PointsTrain.Clear();
+            PointsTest.Clear();
             Thread train = new Thread(new ParameterizedThreadStart(TheardTrain));
-            if (Network.CountLayers != 0 && Converter.Images.Count != 0)
+            if (Network.CountLayers != 0 && Network.selectionData != null)
             {
                 EpothProgress.Value = EpothProgress.Minimum;
-                DataProgress.Value = DataProgress.Minimum;
-                DataProgress.Maximum = Converter.Images.Count;
                 EpothProgress.Maximum = Network.Epoth;
+                BatchBar.Value = BatchBar.Minimum;
+                BatchBar.Maximum = Network.selectionData.Batches.Count;
                 train.Start(sender);
             }
             else
@@ -105,36 +108,33 @@ namespace ConstructorCNN
         private void TheardTrain(object obj)
         {
             Button c = (Button)obj;
-            try
-            {
+            //try
+            //{
                 for (int i = 0; i < Network.Epoth; i++)
                 {
-                    int CountRight = 0;
-                    Dispatcher.Invoke(new Action(() =>
-                    { DataProgress.Value = DataProgress.Minimum; }));
-                    foreach (var image in Converter.Images)
-                    {
-                        Network.ForwardNet(image);
-                        Network.BackNet(image);
-                        if (Network.Answer == image.Right) { CountRight++; }
-                        Dispatcher.Invoke(new Action(() =>
-                        { DataProgress.Value++; }));
-                        if (stoped) { break; }
-                    }
-                    //Status by one epoch
+                    (int, double) result = Train();
+                    //Status by one epoch train
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        StatusBox.AppendText($"Epoth - {i + 1}, Loss - {Math.Round(Network.Loss, 6)}, Count right - {CountRight}\n");
-                        Points.Add(new DataPoint(i + 1, Network.Loss));
-                        ChartsLoss.Series[0].ItemsSource = Points;
-                        ChartsLoss.InvalidatePlot();// InvalidateVisual();
+                        StatusBox.AppendText($"Epoth - {i + 1}, Loss - {Math.Round(result.Item2, 6)}, Count right - {result.Item1}\n");
+                        PointsTrain.Add(new DataPoint(i + 1, Convert.ToDouble(Network.Loss)));
+                        ChartsLoss.Series[0].ItemsSource = PointsTrain;
+                        ChartsLoss.InvalidatePlot();
                         EpothProgress.Value++;
                         StatusBox.ScrollToEnd();
+                    }));
+                    double lossTest = Test();
+                    //Statistic test
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        PointsTest.Add(new DataPoint(i + 1, Convert.ToDouble(lossTest)));
+                        ChartsLoss.Series[1].ItemsSource = PointsTest;
+                        ChartsLoss.InvalidatePlot();
                     }));
                     if (stoped) { break; }
                     Thread.Sleep(5);
                 }
-            }
+/*            }
             catch (Exception e)
             {
                 Dispatcher.Invoke(new Action(() =>
@@ -143,14 +143,65 @@ namespace ConstructorCNN
                     StatusBox.AppendText($"Error! - {e.Message}\n");
                     StatusBox.ScrollToEnd();
                 }));
-            }
+            }*/
             //End
             Dispatcher.Invoke(new Action(() =>
             {
                 EpothProgress.Value = EpothProgress.Minimum;
-                DataProgress.Value = DataProgress.Minimum;
+                BatchBar.Value = BatchBar.Minimum;
+                MinibatchBar.Value = MinibatchBar.Minimum;
                 On_Off(true, c, ConstructNetGrid);
             }));
+        }
+        private double Test()
+        {
+            //Test
+            double AvgLossTest = 0;
+            Dispatcher.Invoke(new Action(() => {
+                MinibatchBar.Maximum = Network.selectionData.Test.Count;
+                MinibatchBar.Value = MinibatchBar.Minimum;
+            }));
+            foreach (var image in Network.selectionData.Test)
+            {
+                Network.ForwardNet(image);
+                Network.BackNoRefresh(image);
+                AvgLossTest += Network.Loss;
+                Dispatcher.Invoke(new Action(() =>
+                { MinibatchBar.Value++; }));
+            }
+            return AvgLossTest / Network.selectionData.Test.Count;
+        }
+        private (int, double) Train()
+        {
+            //Train
+            int CountRight = 0;
+            double AvgLossTrain = 0;
+            Dispatcher.Invoke(new Action(() =>
+            { BatchBar.Value = BatchBar.Minimum; }));
+            foreach (var batch in Network.selectionData.Batches)
+            {
+                Dispatcher.Invoke(new Action(() => {
+                    MinibatchBar.Maximum = batch.Length;
+                    MinibatchBar.Value = MinibatchBar.Minimum;
+                    if ((bool)CheckDrop.IsChecked) { Network.DropOut(); }
+                }));
+                foreach (var image in batch)
+                {
+                    Network.ForwardNet(image);
+                    Network.BackNet(image);
+                    AvgLossTrain += Network.Loss;
+                    if (Network.Answer == image.Right) { CountRight++; }
+                    Dispatcher.Invoke(new Action(() =>
+                    { MinibatchBar.Value++; }));
+                }
+                AvgLossTrain /= batch.Length;
+                Dispatcher.Invoke(new Action(() =>
+                { 
+                    BatchBar.Value++;
+                    if ((bool)CheckDrop.IsChecked) { Network.DropIn(); }
+                }));
+            }
+            return (CountRight, AvgLossTrain / Network.selectionData.Batches.Count);
         }
         private void On_Off( bool OffOn, params FrameworkElement[] controls)
         {
@@ -173,36 +224,63 @@ namespace ConstructorCNN
         {
             stoped = true;
         }
-        private void Button_Browse_Train(object sender, RoutedEventArgs e)
+        private void Button_Browse(object sender, RoutedEventArgs e)
         {
-            BrowseImages(StackImages);
-        }
-        private void Button_Browse_Test(object sender, RoutedEventArgs e)
-        {
-            //TODO: Переделать класс Converter, так чтобы можно было хранить несколько массивов данных
-            BrowseImages(StackImagesTest);
-        }
-        private void BrowseImages(StackPanel panel)
-        {
+            string PathData = "";
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    string PathData = dialog.SelectedPath.ToString();
-                    Converter.DirImagesToTensor(PathData);
-                    foreach (var image in Converter.ImagesPath)
-                    {
-                        Image im = new Image();
-                        im.Source = new BitmapImage(new Uri(image));
-                        panel.Children.Add(im);
-                    }
+                    PathData = dialog.SelectedPath.ToString();
                 }
             }
+            IsEnabled = false;
+            new Thread(() =>
+            {
+                BrowseImages(PathData, StackImagesTest, StackImagesTrain);
+            }).Start();
+        }
+        private void BrowseImages(string PathData, StackPanel panelTrain, StackPanel panelTest)
+        {
+            //Train
+            Network.selectionData = new Batch(PathData, batchSize, percent, TypeChannel.RGB);//DirImagesToTensor(PathData);
+            //DataBar.Maximum = Network.selectionData.dataSet.Count;
+            foreach (var mass in Network.selectionData.Batches)
+            {
+                foreach (var image in mass)
+                {
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        Image im = new Image();
+                        im.Source = new BitmapImage(new Uri(image.Path));
+                        panelTrain.Children.Add(im);
+                    }));
+                }
+            }
+            //Test
+            foreach (var image in Network.selectionData.Test)
+            {
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    Image im = new Image();
+                    im.Source = new BitmapImage(new Uri(image.Path));
+                    panelTest.Children.Add(im);
+                }));
+            }
+            Dispatcher.Invoke(new Action(() =>
+            {
+                Network.InitializationInputAndClass();
+                MenuItem a = (MenuItem)MenuCreateLayers.Items[1];
+                a.IsEnabled = true;
+                IsEnabled = true;
+                //DataBar.Value = DataBar.Minimum;
+            }));
         }
         private void Button_Clear(object sender, RoutedEventArgs e)
         {
-            Converter.ClearDate();
-            StackImages.Children.Clear();
+            Network.selectionData = null;
+            StackImagesTest.Children.Clear();
+            StackImagesTrain.Children.Clear();
         }
         private void Load_Click(object sender, RoutedEventArgs e)
         {
@@ -253,41 +331,52 @@ namespace ConstructorCNN
                 }
             }
         }
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            TextBox box = (TextBox)sender;
-            try
-            {
-/*                Converter.DirImagesToTensor(box.Text);
-                foreach (var image in Converter.ImagesPath)
-                {
-                    Image im = new Image();
-                    im.Source = new BitmapImage(new Uri(image));
-                    StackImages.Children.Add(im);
-                }*/
-            }
-            catch (Exception ex) { box.Text = $"Путь к директории скорее всего неверно записан.({ex.Message})"; }
-        }
         private void Button_Reset(object sender, RoutedEventArgs e)
         {
-            ResetB.IsEnabled = false;
-            new Thread(() => 
+            IsEnabled = false;
+            if (Network.selectionData != null)
             {
-                int CountRight = 0;
-                foreach (var image in Converter.Images)
+                BatchData.Maximum = Network.selectionData.Test.Count;
+                new Thread(() =>
                 {
+                    int CountRight = 0;
+                    double AvgLossTest = 0;
                     Network.InitializationConv();
                     Network.InitializationFully();
-                    Network.ForwardNet(image);
-                    if (Network.Answer == image.Right) { CountRight++; }
-                }
-                Dispatcher.Invoke(new Action(() => 
-                {
-                    StatusReset.AppendText($"Count right - {CountRight}\n");
-                    StatusReset.ScrollToEnd();
-                    ResetB.IsEnabled = true;
-                }));
-            }).Start();
+                    foreach (var image in Network.selectionData.Test)
+                    {
+                        Network.ForwardNet(image);
+                        Network.BackNoRefresh(image);
+                        AvgLossTest += Network.Loss;
+                        if (Network.Answer == image.Right) { CountRight++; }
+                        Dispatcher.Invoke(new Action(() =>
+                        {
+                            BatchData.Value++;
+                        }));
+                    }
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        BatchData.Value = BatchData.Minimum;
+                        StatusReset.AppendText($"Loss - {AvgLossTest / Network.selectionData.Test.Count},Count right - {CountRight}\n");
+                        StatusReset.ScrollToEnd();
+                        IsEnabled = true;
+                    }));
+                }).Start();
+            }
+            else
+            {
+                StatusReset.Clear();
+                StatusReset.AppendText($"No data!\n");
+                StatusReset.ScrollToEnd();
+                IsEnabled = true;
+            }
+        }
+        private void ClearData_Click(object sender, RoutedEventArgs e)
+        {
+            StackImagesTest.Children.Clear(); StackImagesTrain.Children.Clear();
+            Network.selectionData = null;
+            MenuItem a = (MenuItem)MenuCreateLayers.Items[1];
+            a.IsEnabled = false;
         }
         private void TextBox_EpothChanged(object sender, TextChangedEventArgs e)
         {
@@ -299,13 +388,65 @@ namespace ConstructorCNN
                 EpothsText.CaretIndex = EpothsText.Text.Length;
             }
         }
+        private void TextBox_LearnRChanged(object sender, TextChangedEventArgs e)
+        {
+            //TextBox a = (TextBox)sender;
+            if (!String.IsNullOrWhiteSpace(EpothsText.Text))
+            {
+                EpothsText.Text = EpothsText.Text.Replace(" ", "");
+                Network.Epoth = Convert.ToInt32(EpothsText.Text);
+                EpothsText.CaretIndex = EpothsText.Text.Length;
+            }
+        }
+
+        private void TextBox_RatioLearnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            Network.LRate = (double)TextBoxChanged((TextBox)sender, Network.LRate);
+        }
+
+        private void TextBox_RatioATextChanged(object sender, TextChangedEventArgs e)
+        {
+            Network.ARatio = (double)TextBoxChanged((TextBox)sender, Network.ARatio);
+        }
+        private void TextBox_ProbabilityChanged(object sender, TextChangedEventArgs e)
+        {
+            Network.Probability = (double)TextBoxChanged((TextBox)sender, Network.Probability);
+        }
+        private void TextBox_PercentChanged(object sender, TextChangedEventArgs e)
+        {
+            percent = (int)TextBoxChanged((TextBox)sender, percent);
+        }
+        private void TextBox_BatchSizeChanged(object sender, TextChangedEventArgs e)
+        {
+            batchSize = (int)TextBoxChanged((TextBox)sender, batchSize);
+        }
         private void TextBox_EpothTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             char number = Convert.ToChar(e.Text);
-            if (!Char.IsDigit(number) && number != 8 && number != 48) // цифры и клавиша BackSpace
+            if (!Char.IsDigit(number)) // цифры 
             {
                 e.Handled = true;
             }
+        }
+        private void TextBox_RatioTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            TextBox box = (TextBox)sender;
+            char number = Convert.ToChar(e.Text);
+            if (!Char.IsDigit(number) && number != 44) // цифры и ,
+            {
+                e.Handled = true;
+            }
+            if (number == 44 && box.Text.Contains(number)) { e.Handled = true; }
+        }
+        private object TextBoxChanged(TextBox box, object data)
+        {
+            if (!String.IsNullOrWhiteSpace(box.Text))
+            {
+                box.Text = box.Text.Replace(" ", "");
+                data = Convert.ChangeType(box.Text, data.GetType());
+                box.CaretIndex = box.Text.Length;
+            }
+            return data;
         }
     }
 }

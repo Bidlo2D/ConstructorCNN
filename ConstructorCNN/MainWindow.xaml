@@ -12,11 +12,11 @@
     <Grid x:Name="Main" Opacity="0.95" Background="#FF7693B0">
         <Grid x:Name="MainConstruct" Margin="0,56,0,0" Background="#FFF0EAEA" Opacity="0.95">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="19*"/>
-                <ColumnDefinition Width="15*"/>
-                <ColumnDefinition Width="34*"/>
+                <ColumnDefinition Width="392*"/>
+                <ColumnDefinition Width="309*"/>
+                <ColumnDefinition Width="701*"/>
             </Grid.ColumnDefinitions>
-            <Grid ch:Name="ConstructNetGrid" Background="#FF2E2B2B" Grid.ColumnSpan="2">
+            <Grid ch:Name="ConstructNetGrid" Background="#FF2E2B2B" Grid.ColumnSpan="3" Margin="0,0,701,0">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -28,7 +28,7 @@
                 <Grid Grid.RowSpan="2">
                     <Grid ShowGridLines="True" HorizontalAlignment="Left" Width="60">
                         <Menu Background="#FF494A53" HorizontalAlignment="Center" Width="60">
-                            <MenuItem Header="" FontFamily="Comic Sans MS" Width="60" FontSize="16" Height="60" Foreground="Black" BorderBrush="{x:Null}">
+                            <MenuItem ch:Name="MenuCreateLayers" Header="" FontFamily="Comic Sans MS" Width="60" FontSize="16" Height="60" Foreground="Black" BorderBrush="{x:Null}">
                                 <MenuItem.OpacityMask>
                                     <ImageBrush ImageSource="/BlackPlus.png" Stretch="Fill" Opacity="1"/>
                                 </MenuItem.OpacityMask>
@@ -39,7 +39,7 @@
                                     <Button Content="Bias" Click="Button_Click_FullyBias"/>
                                     <Button Content="NoBias" Click="Button_Click_FullyNoBias"/>
                                 </MenuItem>
-                                <MenuItem Header="ConvolutionConnected" FontFamily="Comic Sans MS">
+                                <MenuItem x:Name="CreateConvButton" Header="ConvolutionConnected" FontFamily="Comic Sans MS" IsEnabled="False">
                                     <Button x:Name="ConvBiasButton" Content="ConvBias" Click="Button_Click_ConvBias"/>
                                     <Button Content="ConvNoBias" Click="Button_Click_ConvNoBias"/>
                                     <Button Content="Pooling" Click="Button_Click_Pooling"/>
@@ -76,52 +76,62 @@
                     <Grid x:Name="PanelTrain" Background="#FFE5E5E5">
                         <Button Content="Train" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="50" Width="80" Foreground="#FF57CB52" Background="{x:Null}" BorderBrush="Black" Click="Button_Start"/>
                         <Button Content="Stop" Margin="10,65,0,0" VerticalAlignment="Top" Height="49" Foreground="#FFEC3D3D" Background="{x:Null}" BorderBrush="Black" Click="Button_Stop" HorizontalAlignment="Left" Width="80"/>
-                        <ProgressBar x:Name="DataProgress" Height="20" Margin="10,179,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
-                        <oxy:Plot ch:Name="ChartsLoss" Title="{Binding Title}" Margin="10,204,10,10">
+                        <ProgressBar ch:Name="BatchBar" Height="12" Margin="10,177,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
+                        <oxy:Plot ch:Name="ChartsLoss" Title="{Binding Title}" Margin="10,211,10,10" PanCursor="Hand" ZoomHorizontalCursor="SizeWE" ZoomRectangleCursor="SizeNWSE" ZoomVerticalCursor="SizeNS">
                             <oxy:Plot.Series>
-                                <oxy:LineSeries ItemsSource="{Binding Points}"/>
+                                <oxy:LineSeries ItemsSource="{Binding PointsTrain}"/>
+                                <oxy:LineSeries ItemsSource="{Binding PointTest}"/>
                             </oxy:Plot.Series>
                         </oxy:Plot>
-                        <TextBox ch:Name="EpothsText" HorizontalAlignment="Left" Margin="100,124,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="80" Height="25" PreviewTextInput="TextBox_EpothTextInput" TextChanged="TextBox_EpothChanged" Text="100" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1"/>
+                        <TextBox ch:Name="EpothsText" HorizontalAlignment="Left" Margin="100,124,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="59" Height="25" PreviewTextInput="TextBox_EpothTextInput" TextChanged="TextBox_EpothChanged" Text="100" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1"/>
                         <Label Content="Epoths -" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top" Width="90" RenderTransformOrigin="0.5,0.197"/>
-                        <TextBox ch:Name="StatusBox" Margin="95,10,95,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="104" TextAlignment="Center" IsReadOnly="True"/>
+                        <TextBox ch:Name="StatusBox" Margin="95,10,95,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="103" TextAlignment="Center" IsReadOnly="True"/>
                         <Button ch:Name="LoadB" Content="Load" Margin="0,12,10,0" VerticalAlignment="Top" Height="50" Foreground="Black" Background="{ch:Null}" BorderBrush="Black" Click="Load_Click" HorizontalAlignment="Right" Width="80"/>
                         <Button ch:Name="SaveB" Content="Save" Margin="0,65,10,0" VerticalAlignment="Top" Height="50" Foreground="Black" Background="{ch:Null}" BorderBrush="Black" Click="Save_Click" HorizontalAlignment="Right" Width="80"/>
                         <ProgressBar ch:Name="EpothProgress" Height="20" Margin="10,154,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
-                    </Grid>
-                </TabItem>
-                <TabItem Header="Testing">
-                    <Grid x:Name="PanelTesting" Background="#FFE5E5E5">
-                        <TextBox ch:Name="StatusReset" Margin="95,10,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="79" TextAlignment="Center" IsReadOnly="True"/>
-                        <Button ch:Name="ResetB" Content="Reset" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="79" Width="80" Foreground="#FF47C961" Click="Button_Reset" BorderBrush="Black" IsCancel="True"/>
-                        <TextBox HorizontalAlignment="Center" Margin="0,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="465" Height="26" TextChanged="TextBox_TextChanged"/>
-                        <Button ch:Name="BrowseB_Copy" Content="Browse" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="100" Click="Button_Browse_Test" Height="35"/>
-                        <ScrollViewer ch:Name="ScrollImages_Copy" Margin="10,134,10,21" BorderBrush="#FF5D5050">
-                            <ScrollViewer.Background>
-                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                    <GradientStop Color="#FFDAD0D0"/>
-                                    <GradientStop Color="White" Offset="1"/>
-                                </LinearGradientBrush>
-                            </ScrollViewer.Background>
-                            <StackPanel ch:Name="StackImagesTest"/>
-                        </ScrollViewer>
-                        <Button ch:Name="ClearData_Copy" Content="Clear data" HorizontalAlignment="Left" Margin="585,94,0,0" VerticalAlignment="Top" Width="100" Height="35"/>
+                        <ProgressBar ch:Name="MinibatchBar" Height="12" Margin="10,194,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
+                        <CheckBox ch:Name="CheckDrop" Content="" HorizontalAlignment="Left" Margin="487,130,0,0" VerticalAlignment="Top" Width="25" IsChecked="True"/>
+                        <TextBox ch:Name="ProbabilityBox" HorizontalAlignment="Left" Margin="628,123,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="57" Height="25" TextChanged="TextBox_ProbabilityChanged" Text="30" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" TextInput="TextBox_EpothTextInput"/>
+                        <Label Content="Probability -" HorizontalAlignment="Left" Margin="504,118,0,0" VerticalAlignment="Top" Width="119" RenderTransformOrigin="0.5,0.197"/>
+                        <TextBox ch:Name="ProbabilityBox_Copy" HorizontalAlignment="Left" Margin="249,123,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="67" Height="25" Text="0,15" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" PreviewTextInput="TextBox_RatioTextInput" TextChanged="TextBox_RatioLearnTextChanged"/>
+                        <Label Content="Learn - " HorizontalAlignment="Left" Margin="164,118,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.5,0.197"/>
+                        <TextBox ch:Name="ProbabilityBox_Copy1" HorizontalAlignment="Left" Margin="417,123,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="57" Height="25" Text="0,3" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" PreviewTextInput="TextBox_RatioTextInput" TextChanged="TextBox_RatioATextChanged"/>
+                        <Label Content="RatioA - " HorizontalAlignment="Left" Margin="321,118,0,0" VerticalAlignment="Top" Width="91" RenderTransformOrigin="0.5,0.197"/>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Data">
-                    <Grid x:Name="PanelData" Background="#FFE5E5E5">
-                        <TextBox HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="465" Height="29"/>
-                        <Button ch:Name="BrowseB" Content="Browse" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Click="Button_Browse_Train"/>
-                        <ScrollViewer ch:Name="ScrollImages" Margin="10,44,10,21" BorderBrush="#FF5D5050">
+                    <Grid x:Name="PanelTesting" Background="#FFE5E5E5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="117*"/>
+                            <ColumnDefinition Width="115*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox ch:Name="StatusReset" Margin="95,10,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="79" TextAlignment="Center" IsReadOnly="True" Grid.ColumnSpan="2"/>
+                        <Button ch:Name="ResetB" Content="Reset" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="79" Width="80" Foreground="#FF47C961" Click="Button_Reset" BorderBrush="Black" IsCancel="True"/>
+                        <Button ch:Name="BrowseB_Copy" Content="Browse" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="100" Click="Button_Browse" Height="35"/>
+                        <Button ch:Name="ClearData_Copy" Content="Clear data" HorizontalAlignment="Left" Margin="234,94,0,0" VerticalAlignment="Top" Width="100" Height="35" Click="ClearData_Click" Grid.Column="1"/>
+                        <Label Content="Percent test:" Margin="115,94,108,670"/>
+                        <TextBox ch:Name="PercentBox" HorizontalAlignment="Left" Margin="248,98,0,0" Text="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="83" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" TextChanged="TextBox_PercentChanged" PreviewTextInput="TextBox_RatioTextInput"/>
+                        <Label Content="Batch size:" Margin="341,94,242,670" Grid.ColumnSpan="2"/>
+                        <TextBox ch:Name="BatchSizeBox" HorizontalAlignment="Left" Margin="103,98,0,0" Text="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="83" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" TextChanged="TextBox_BatchSizeChanged" Grid.Column="1" PreviewTextInput="TextBox_EpothTextInput"/>
+                        <ScrollViewer ch:Name="Scroll_Test" BorderBrush="#FF5D5050" Margin="10,169,10,10">
                             <ScrollViewer.Background>
                                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                    <GradientStop Color="#FFDAD0D0"/>
+                                    <GradientStop Color="#FFD0D3DA"/>
                                     <GradientStop Color="White" Offset="1"/>
                                 </LinearGradientBrush>
                             </ScrollViewer.Background>
-                            <StackPanel ch:Name="StackImages"/>
+                            <StackPanel ch:Name="StackImagesTest" HorizontalAlignment="Right"/>
                         </ScrollViewer>
-                        <Button ch:Name="ClearData" Content="Clear data" HorizontalAlignment="Left" Margin="585,10,0,0" VerticalAlignment="Top" Width="100" Click="Button_Clear"/>
+                        <ScrollViewer ch:Name="Scroll_Train" BorderBrush="#FF5D5050" Margin="10,169,10,10" Grid.Column="1">
+                            <ScrollViewer.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FFE4C3C3"/>
+                                    <GradientStop Color="White" Offset="1"/>
+                                </LinearGradientBrush>
+                            </ScrollViewer.Background>
+                            <StackPanel ch:Name="StackImagesTrain"/>
+                        </ScrollViewer>
+                        <ProgressBar ch:Name="BatchData" HorizontalAlignment="Left" Height="33" Margin="10,131,0,0" VerticalAlignment="Top" Width="675" Grid.ColumnSpan="2"/>
                     </Grid>
                 </TabItem>
             </TabControl>
