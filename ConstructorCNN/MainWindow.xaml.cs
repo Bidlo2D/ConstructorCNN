@@ -84,30 +84,28 @@ namespace ConstructorCNN
         }
         private void Button_Start(object sender, RoutedEventArgs e)
         {
-            Button b = (Button)sender;
-            On_Off(false, b, ConstructNetGrid);
+            On_Off(false, StartB, ConstructNetGrid, TabData, EpothsBox, ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB);
             stoped = false;
             StatusBox.Clear();
             PointsTrain.Clear();
             PointsTest.Clear();
-            Thread train = new Thread(new ParameterizedThreadStart(TheardTrain));
-            if (Network.CountLayers != 0 && Network.selectionData != null)
+            Thread train = new Thread(TheardTrain);
+            if (Network.CountLayers != 0 && Network.SelectionData != null)
             {
                 EpothProgress.Value = EpothProgress.Minimum;
                 EpothProgress.Maximum = Network.Epoth;
                 BatchBar.Value = BatchBar.Minimum;
-                BatchBar.Maximum = Network.selectionData.Batches.Count;
-                train.Start(sender);
+                BatchBar.Maximum = Network.SelectionData.Batches.Count;
+                train.Start();
             }
             else
             {
                 StatusBox.AppendText("Error - No data!");
-                On_Off(true, b, ConstructNetGrid);
+                On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB);
             }
         }
-        private void TheardTrain(object obj)
+        private void TheardTrain()
         {
-            Button c = (Button)obj;
             //try
             //{
                 for (int i = 0; i < Network.Epoth; i++)
@@ -150,7 +148,7 @@ namespace ConstructorCNN
                 EpothProgress.Value = EpothProgress.Minimum;
                 BatchBar.Value = BatchBar.Minimum;
                 MinibatchBar.Value = MinibatchBar.Minimum;
-                On_Off(true, c, ConstructNetGrid);
+                On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB);
             }));
         }
         private double Test()
@@ -158,10 +156,10 @@ namespace ConstructorCNN
             //Test
             double AvgLossTest = 0;
             Dispatcher.Invoke(new Action(() => {
-                MinibatchBar.Maximum = Network.selectionData.Test.Count;
+                MinibatchBar.Maximum = Network.SelectionData.Test.Count;
                 MinibatchBar.Value = MinibatchBar.Minimum;
             }));
-            foreach (var image in Network.selectionData.Test)
+            foreach (var image in Network.SelectionData.Test)
             {
                 Network.ForwardNet(image);
                 Network.BackNoRefresh(image);
@@ -169,7 +167,7 @@ namespace ConstructorCNN
                 Dispatcher.Invoke(new Action(() =>
                 { MinibatchBar.Value++; }));
             }
-            return AvgLossTest / Network.selectionData.Test.Count;
+            return AvgLossTest / Network.SelectionData.Test.Count;
         }
         private (int, double) Train()
         {
@@ -178,7 +176,7 @@ namespace ConstructorCNN
             double AvgLossTrain = 0;
             Dispatcher.Invoke(new Action(() =>
             { BatchBar.Value = BatchBar.Minimum; }));
-            foreach (var batch in Network.selectionData.Batches)
+            foreach (var batch in Network.SelectionData.Batches)
             {
                 Dispatcher.Invoke(new Action(() => {
                     MinibatchBar.Maximum = batch.Length;
@@ -201,7 +199,7 @@ namespace ConstructorCNN
                     if ((bool)CheckDrop.IsChecked) { Network.DropIn(); }
                 }));
             }
-            return (CountRight, AvgLossTrain / Network.selectionData.Batches.Count);
+            return (CountRight, AvgLossTrain / Network.SelectionData.Batches.Count);
         }
         private void On_Off( bool OffOn, params FrameworkElement[] controls)
         {
@@ -232,20 +230,22 @@ namespace ConstructorCNN
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     PathData = dialog.SelectedPath.ToString();
+                    IsEnabled = false;
                 }
             }
-            IsEnabled = false;
             new Thread(() =>
             {
-                BrowseImages(PathData, StackImagesTest, StackImagesTrain);
+                if (!String.IsNullOrEmpty(PathData))
+                { BrowseImages(PathData, StackImagesTest, StackImagesTrain); }
             }).Start();
         }
         private void BrowseImages(string PathData, StackPanel panelTrain, StackPanel panelTest)
         {
-            //Train
-            Network.selectionData = new Batch(PathData, batchSize, percent, TypeChannel.RGB);//DirImagesToTensor(PathData);
-            //DataBar.Maximum = Network.selectionData.dataSet.Count;
-            foreach (var mass in Network.selectionData.Batches)
+            Dispatcher.Invoke(new Action(() =>
+            { panelTrain.Children.Clear(); panelTest.Children.Clear(); }));
+            Network.SelectionData = new Batch(PathData, batchSize, percent, TypeChannel.RGB);//DirImagesToTensor(PathData);
+            //DataBar.Maximum = Network.SelectionData.dataSet.Count;
+            foreach (var mass in Network.SelectionData.Batches)
             {
                 foreach (var image in mass)
                 {
@@ -258,7 +258,7 @@ namespace ConstructorCNN
                 }
             }
             //Test
-            foreach (var image in Network.selectionData.Test)
+            foreach (var image in Network.SelectionData.Test)
             {
                 Dispatcher.Invoke(new Action(() =>
                 {
@@ -268,17 +268,11 @@ namespace ConstructorCNN
                 }));
             }
             Dispatcher.Invoke(new Action(() =>
-            {
-                Network.InitializationInputAndClass();
-                MenuItem a = (MenuItem)MenuCreateLayers.Items[1];
-                a.IsEnabled = true;
-                IsEnabled = true;
-                //DataBar.Value = DataBar.Minimum;
-            }));
+            { IsEnabled = true; }));
         }
         private void Button_Clear(object sender, RoutedEventArgs e)
         {
-            Network.selectionData = null;
+            Network.SelectionData = null;
             StackImagesTest.Children.Clear();
             StackImagesTrain.Children.Clear();
         }
@@ -308,6 +302,7 @@ namespace ConstructorCNN
                                 OnCreateLayerLoad(item, StackFully, InfoGridFully, ref fully);
                             }
                         }
+                        Network.CheckLoad();
                     }
                     catch (Exception error)
                     {
@@ -334,16 +329,16 @@ namespace ConstructorCNN
         private void Button_Reset(object sender, RoutedEventArgs e)
         {
             IsEnabled = false;
-            if (Network.selectionData != null)
+            if (Network.SelectionData != null)
             {
-                BatchData.Maximum = Network.selectionData.Test.Count;
+                BatchData.Maximum = Network.SelectionData.Test.Count;
                 new Thread(() =>
                 {
                     int CountRight = 0;
                     double AvgLossTest = 0;
                     Network.InitializationConv();
                     Network.InitializationFully();
-                    foreach (var image in Network.selectionData.Test)
+                    foreach (var image in Network.SelectionData.Test)
                     {
                         Network.ForwardNet(image);
                         Network.BackNoRefresh(image);
@@ -357,7 +352,7 @@ namespace ConstructorCNN
                     Dispatcher.Invoke(new Action(() =>
                     {
                         BatchData.Value = BatchData.Minimum;
-                        StatusReset.AppendText($"Loss - {AvgLossTest / Network.selectionData.Test.Count},Count right - {CountRight}\n");
+                        StatusReset.AppendText($"Loss - {AvgLossTest / Network.SelectionData.Test.Count},Count right - {CountRight}\n");
                         StatusReset.ScrollToEnd();
                         IsEnabled = true;
                     }));
@@ -374,36 +369,34 @@ namespace ConstructorCNN
         private void ClearData_Click(object sender, RoutedEventArgs e)
         {
             StackImagesTest.Children.Clear(); StackImagesTrain.Children.Clear();
-            Network.selectionData = null;
+            Network.SelectionData = null;
             MenuItem a = (MenuItem)MenuCreateLayers.Items[1];
             a.IsEnabled = false;
         }
         private void TextBox_EpothChanged(object sender, TextChangedEventArgs e)
         {
             //TextBox a = (TextBox)sender;
-            if (!String.IsNullOrWhiteSpace(EpothsText.Text))
+            if (!String.IsNullOrWhiteSpace(EpothsBox.Text))
             {
-                EpothsText.Text = EpothsText.Text.Replace(" ", "");
-                Network.Epoth = Convert.ToInt32(EpothsText.Text);
-                EpothsText.CaretIndex = EpothsText.Text.Length;
+                EpothsBox.Text = EpothsBox.Text.Replace(" ", "");
+                Network.Epoth = Convert.ToInt32(EpothsBox.Text);
+                EpothsBox.CaretIndex = EpothsBox.Text.Length;
             }
         }
         private void TextBox_LearnRChanged(object sender, TextChangedEventArgs e)
         {
             //TextBox a = (TextBox)sender;
-            if (!String.IsNullOrWhiteSpace(EpothsText.Text))
+            if (!String.IsNullOrWhiteSpace(EpothsBox.Text))
             {
-                EpothsText.Text = EpothsText.Text.Replace(" ", "");
-                Network.Epoth = Convert.ToInt32(EpothsText.Text);
-                EpothsText.CaretIndex = EpothsText.Text.Length;
+                EpothsBox.Text = EpothsBox.Text.Replace(" ", "");
+                Network.Epoth = Convert.ToInt32(EpothsBox.Text);
+                EpothsBox.CaretIndex = EpothsBox.Text.Length;
             }
         }
-
         private void TextBox_RatioLearnTextChanged(object sender, TextChangedEventArgs e)
         {
             Network.LRate = (double)TextBoxChanged((TextBox)sender, Network.LRate);
         }
-
         private void TextBox_RatioATextChanged(object sender, TextChangedEventArgs e)
         {
             Network.ARatio = (double)TextBoxChanged((TextBox)sender, Network.ARatio);
