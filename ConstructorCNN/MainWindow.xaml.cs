@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,10 +23,15 @@ namespace ConstructorCNN
         private IList<DataPoint> PointsTrain = new List<DataPoint>();
         private bool statusWin = true, stoped;
         private int conv, fully, percent, batchSize;
+        class MyClass
+        {
+            public int Pop { get; set; } = 5;
+        }
         public MainWindow()
         {
             InitializeComponent();
-            //Converter.DirImagesToTensor(@"C:\Games\Programs\Fonts\alphabet");
+            ChannelComboBox.ItemsSource = Enum.GetValues(typeof(TypeChannel)).Cast<TypeChannel>();
+            ChannelComboBox.SelectedItem = Network.Channel;
             OnCreateLayerAdd(new FullyConnectInput(), StackFully, InfoGridFully, ref fully, false);
             OnCreateLayerAdd(new FullyConnectClassifier(), StackFully, InfoGridFully, ref fully, false);
         }
@@ -192,7 +199,7 @@ namespace ConstructorCNN
                     Dispatcher.Invoke(new Action(() =>
                     { MinibatchBar.Value++; }));
                 }
-                AvgLossTrain /= batch.Length;
+                //AvgLossTrain /= batch.Length;
                 Dispatcher.Invoke(new Action(() =>
                 { 
                     BatchBar.Value++;
@@ -243,7 +250,7 @@ namespace ConstructorCNN
         {
             Dispatcher.Invoke(new Action(() =>
             { panelTrain.Children.Clear(); panelTest.Children.Clear(); }));
-            Network.SelectionData = new Batch(PathData, batchSize, percent, TypeChannel.RGB);//DirImagesToTensor(PathData);
+            Network.SelectionData = new Batch(PathData, batchSize, percent);//DirImagesToTensor(PathData);
             //DataBar.Maximum = Network.SelectionData.dataSet.Count;
             foreach (var mass in Network.SelectionData.Batches)
             {
@@ -370,8 +377,13 @@ namespace ConstructorCNN
         {
             StackImagesTest.Children.Clear(); StackImagesTrain.Children.Clear();
             Network.SelectionData = null;
-            MenuItem a = (MenuItem)MenuCreateLayers.Items[1];
-            a.IsEnabled = false;
+            //MenuItem a = (MenuItem)MenuCreateLayers.Items[1];
+            //a.IsEnabled = false;
+        }
+        private void ComboBoxChannel_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox a = (ComboBox)sender;
+            Network.Channel = (TypeChannel)a.SelectedItem;
         }
         private void TextBox_EpothChanged(object sender, TextChangedEventArgs e)
         {

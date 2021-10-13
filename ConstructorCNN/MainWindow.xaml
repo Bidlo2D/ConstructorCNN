@@ -108,7 +108,6 @@
                         <TextBox ch:Name="StatusReset" Margin="95,10,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="79" TextAlignment="Center" IsReadOnly="True" Grid.ColumnSpan="2"/>
                         <Button ch:Name="ResetB" Content="Reset" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="79" Width="80" Foreground="#FF47C961" Click="Button_Reset" BorderBrush="Black" IsCancel="True"/>
                         <Button ch:Name="BrowseB_Copy" Content="Browse" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="100" Click="Button_Browse" Height="35"/>
-                        <Button ch:Name="ClearData_Copy" Content="Clear data" HorizontalAlignment="Left" Margin="234,94,0,0" VerticalAlignment="Top" Width="100" Height="35" Click="ClearData_Click" Grid.Column="1"/>
                         <Label Content="Percent test:" Margin="115,94,108,670"/>
                         <TextBox ch:Name="PercentBox" HorizontalAlignment="Left" Margin="248,98,0,0" Text="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="83" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" TextChanged="TextBox_PercentChanged" PreviewTextInput="TextBox_RatioTextInput"/>
                         <Label Content="Batch size:" Margin="341,94,242,670" Grid.ColumnSpan="2"/>
@@ -132,6 +131,7 @@
                             <StackPanel ch:Name="StackImagesTrain"/>
                         </ScrollViewer>
                         <ProgressBar ch:Name="BatchData" HorizontalAlignment="Left" Height="33" Margin="10,131,0,0" VerticalAlignment="Top" Width="675" Grid.ColumnSpan="2"/>
+                        <ComboBox ch:Name="ChannelComboBox" Grid.Column="1" HorizontalAlignment="Left" Height="26" Margin="205,98,0,0" VerticalAlignment="Top" Width="130" SelectionChanged="ComboBoxChannel_SelectionChanged"/>
                     </Grid>
                 </TabItem>
             </TabControl>

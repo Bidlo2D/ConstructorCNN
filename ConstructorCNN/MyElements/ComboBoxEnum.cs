@@ -33,16 +33,6 @@ namespace ConstructorCNN
             SelectionChanged += ComboBox_SelectionChanged;
         }
 
-        private void LayerData_ParamsChanged(object sender, EventChangedParams e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private T dosomething<T>(object o)
-        {
-            T enumVal = (T)Enum.Parse(typeof(T), o.ToString());
-            return enumVal;
-        }
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             foreach (var field in layerData.GetType().GetProperties())
@@ -62,24 +52,5 @@ namespace ConstructorCNN
                 }
             }
         }
-/*        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            foreach (var field in layerData.GetType().GetProperties())
-            {
-                if (field.Name == dataName && field.CanWrite)
-                {
-                    if (field.GetValue(layerData).GetType() == typeof(bool))
-                    {
-                        field.SetValue(layerData, Convert.ToBoolean(SelectedValue));
-                    }
-                    else
-                    {
-                        Enum.TryParse(field.GetValue(layerData).GetType(), SelectedValue.ToString(), out object newData);
-                        field.SetValue(layerData, newData);
-                    }
-                    break;
-                }
-            }
-        }*/
     }
 }
