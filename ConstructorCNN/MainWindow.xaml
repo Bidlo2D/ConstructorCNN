@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ch="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:oxy="http://oxyplot.org/wpf" xmlns:local="clr-namespace:ConstructorCNN"
     x:Class="ConstructorCNN.MainWindow"
-    mc:Ignorable="d" Height="892" Width="1402" ResizeMode="CanResizeWithGrip" WindowStyle="None" WindowStartupLocation="CenterScreen" Background="{x:Null}" AllowsTransparency="True" Opacity="0.92" FontSize="18" FontFamily="Comic Sans MS" FontWeight="Bold">
+    mc:Ignorable="d" Height="990" Width="1402" ResizeMode="CanResizeWithGrip" WindowStyle="None" WindowStartupLocation="CenterScreen" Background="{x:Null}" AllowsTransparency="True" Opacity="0.92" FontSize="18" FontFamily="Comic Sans MS" FontWeight="Bold">
     <Window.DataContext>
         <local:LossViewModel/>
     </Window.DataContext>
@@ -16,7 +16,7 @@
                 <ColumnDefinition Width="309*"/>
                 <ColumnDefinition Width="701*"/>
             </Grid.ColumnDefinitions>
-            <Grid ch:Name="ConstructNetGrid" Background="#FF2E2B2B" Grid.ColumnSpan="3" Margin="0,0,701,0">
+            <Grid ch:Name="ConstructNetGrid" Background="#FF2E2B2B" Grid.ColumnSpan="2">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -76,27 +76,27 @@
                     <Grid x:Name="PanelTrain" Background="#FFE5E5E5">
                         <Button ch:Name="StartB" Content="Train" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="50" Width="80" Foreground="#FF57CB52" Background="{x:Null}" BorderBrush="Black" Click="Button_Start"/>
                         <Button ch:Name="StopB" Content="Stop" Margin="10,65,0,0" VerticalAlignment="Top" Height="49" Foreground="#FFEC3D3D" Background="{x:Null}" BorderBrush="Black" Click="Button_Stop" HorizontalAlignment="Left" Width="80"/>
-                        <ProgressBar ch:Name="BatchBar" Height="12" Margin="10,177,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
-                        <oxy:Plot ch:Name="ChartsLoss" Title="{Binding Title}" Margin="10,211,10,10" PanCursor="Hand" ZoomHorizontalCursor="SizeWE" ZoomRectangleCursor="SizeNWSE" ZoomVerticalCursor="SizeNS">
+                        <ProgressBar ch:Name="BatchBar" Height="12" Margin="10,213,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
+                        <oxy:Plot ch:Name="ChartsLoss" Title="{Binding Title}" Margin="10,250,10,10" PanCursor="Hand" ZoomHorizontalCursor="SizeWE" ZoomRectangleCursor="SizeNWSE" ZoomVerticalCursor="SizeNS">
                             <oxy:Plot.Series>
                                 <oxy:LineSeries ItemsSource="{Binding PointsTrain}"/>
                                 <oxy:LineSeries ItemsSource="{Binding PointTest}"/>
                             </oxy:Plot.Series>
                         </oxy:Plot>
-                        <TextBox ch:Name="EpothsBox" HorizontalAlignment="Left" Margin="100,124,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="59" Height="25" PreviewTextInput="TextBox_EpothTextInput" TextChanged="TextBox_EpothChanged" Text="100" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1"/>
+                        <TextBox ch:Name="EpothsBox" HorizontalAlignment="Left" Margin="100,124,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="248" Height="25" PreviewTextInput="TextBox_EpothTextInput" TextChanged="TextBox_EpothChanged" Text="100" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1"/>
                         <Label Content="Epoths -" HorizontalAlignment="Left" Margin="10,119,0,0" VerticalAlignment="Top" Width="90" RenderTransformOrigin="0.5,0.197"/>
                         <TextBox ch:Name="StatusBox" Margin="95,10,95,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="103" TextAlignment="Center" IsReadOnly="True"/>
                         <Button ch:Name="LoadB" Content="Load" Margin="0,12,10,0" VerticalAlignment="Top" Height="50" Foreground="Black" Background="{ch:Null}" BorderBrush="Black" Click="Load_Click" HorizontalAlignment="Right" Width="80"/>
                         <Button ch:Name="SaveB" Content="Save" Margin="0,65,10,0" VerticalAlignment="Top" Height="50" Foreground="Black" Background="{ch:Null}" BorderBrush="Black" Click="Save_Click" HorizontalAlignment="Right" Width="80"/>
-                        <ProgressBar ch:Name="EpothProgress" Height="20" Margin="10,154,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
-                        <ProgressBar ch:Name="MinibatchBar" Height="12" Margin="10,194,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
-                        <CheckBox ch:Name="CheckDrop" Content="" HorizontalAlignment="Left" Margin="487,130,0,0" VerticalAlignment="Top" Width="25" IsChecked="True"/>
-                        <TextBox ch:Name="ProbabilityBox" HorizontalAlignment="Left" Margin="628,123,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="57" Height="25" TextChanged="TextBox_ProbabilityChanged" Text="30" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" TextInput="TextBox_EpothTextInput"/>
-                        <Label Content="Probability -" HorizontalAlignment="Left" Margin="504,118,0,0" VerticalAlignment="Top" Width="119" RenderTransformOrigin="0.5,0.197"/>
-                        <TextBox ch:Name="LearnRatioBox" HorizontalAlignment="Left" Margin="249,123,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="67" Height="25" Text="0,15" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" PreviewTextInput="TextBox_RatioTextInput" TextChanged="TextBox_RatioLearnTextChanged"/>
-                        <Label Content="Learn - " HorizontalAlignment="Left" Margin="164,118,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.5,0.197"/>
-                        <TextBox ch:Name="RatioBoxA" HorizontalAlignment="Left" Margin="417,123,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="57" Height="25" Text="0,3" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" PreviewTextInput="TextBox_RatioTextInput" TextChanged="TextBox_RatioATextChanged"/>
-                        <Label Content="RatioA - " HorizontalAlignment="Left" Margin="321,118,0,0" VerticalAlignment="Top" Width="91" RenderTransformOrigin="0.5,0.197"/>
+                        <ProgressBar ch:Name="EpothProgress" Height="20" Margin="10,190,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
+                        <ProgressBar ch:Name="MinibatchBar" Height="12" Margin="10,230,10,0" VerticalAlignment="Top" BorderBrush="Black"/>
+                        <CheckBox ch:Name="CheckDrop" Content="" HorizontalAlignment="Left" Margin="355,161,0,0" VerticalAlignment="Top" Width="25" IsChecked="True"/>
+                        <TextBox ch:Name="ProbabilityBox" HorizontalAlignment="Left" Margin="505,155,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="180" Height="25" TextChanged="TextBox_ProbabilityChanged" Text="30" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" TextInput="TextBox_EpothTextInput"/>
+                        <Label Content="Probability -" HorizontalAlignment="Left" Margin="380,150,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.5,0.197"/>
+                        <TextBox ch:Name="LearnRatioBox" HorizontalAlignment="Left" Margin="96,155,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="252" Height="25" Text="0,15" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" PreviewTextInput="TextBox_RatioTextInput" TextChanged="TextBox_RatioLearnTextChanged"/>
+                        <Label Content="Learn - " HorizontalAlignment="Left" Margin="15,150,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.5,0.197"/>
+                        <TextBox ch:Name="RatioBoxA" HorizontalAlignment="Left" Margin="458,122,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="227" Height="25" Text="0,3" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" PreviewTextInput="TextBox_RatioTextInput" TextChanged="TextBox_RatioATextChanged"/>
+                        <Label Content="RatioA - " HorizontalAlignment="Left" Margin="368,118,0,0" VerticalAlignment="Top" Width="90" RenderTransformOrigin="0.5,0.197"/>
                     </Grid>
                 </TabItem>
                 <TabItem ch:Name="TabData" Header="Data">
@@ -132,6 +132,14 @@
                         </ScrollViewer>
                         <ProgressBar ch:Name="BatchData" HorizontalAlignment="Left" Height="33" Margin="10,131,0,0" VerticalAlignment="Top" Width="675" Grid.ColumnSpan="2"/>
                         <ComboBox ch:Name="ChannelComboBox" Grid.Column="1" HorizontalAlignment="Left" Height="26" Margin="205,98,0,0" VerticalAlignment="Top" Width="130" SelectionChanged="ComboBoxChannel_SelectionChanged"/>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Testing">
+                    <Grid>
+                        <Button ch:Name="BrowseTestB" Content="Browse" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="#FF4473D8" Click="BrowseTestB_Click"/>
+                        <TextBox ch:Name="ResultTestingBox" Margin="80,10,80,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="29"/>
+                        <Image ch:Name="ImageTest" Margin="10,49,10,10"/>
+                        <Button ch:Name="TestingB" Content="Test" HorizontalAlignment="Left" Margin="620,10,0,0" VerticalAlignment="Top" Width="65" Foreground="#FF409968" Click="TestingB_Click"/>
                     </Grid>
                 </TabItem>
             </TabControl>

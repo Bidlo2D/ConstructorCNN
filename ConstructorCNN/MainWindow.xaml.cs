@@ -23,6 +23,7 @@ namespace ConstructorCNN
         private IList<DataPoint> PointsTrain = new List<DataPoint>();
         private bool statusWin = true, stoped;
         private int conv, fully, percent, batchSize;
+        private Tensor testImage;
         class MyClass
         {
             public int Pop { get; set; } = 5;
@@ -199,7 +200,7 @@ namespace ConstructorCNN
                     Dispatcher.Invoke(new Action(() =>
                     { MinibatchBar.Value++; }));
                 }
-                //AvgLossTrain /= batch.Length;
+                AvgLossTrain /= batch.Length;
                 Dispatcher.Invoke(new Action(() =>
                 { 
                     BatchBar.Value++;
@@ -421,6 +422,26 @@ namespace ConstructorCNN
         {
             percent = (int)TextBoxChanged((TextBox)sender, percent);
         }
+        private void BrowseTestB_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new System.Windows.Forms.OpenFileDialog())
+            {
+                dialog.Filter = "Image Files|*.jpg;*.png;";
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(dialog.FileName);
+                    testImage = new Tensor(bitmap, Network.Channel, 0, dialog.FileName);
+                    ImageTest.Source = new BitmapImage(new Uri(testImage.Path));
+                }
+            }
+        }
+
+        private void TestingB_Click(object sender, RoutedEventArgs e)
+        {
+            Network.ForwardNet(testImage);
+            ResultTestingBox.Text = $"Answer = {Network.Answer}";
+        }
+
         private void TextBox_BatchSizeChanged(object sender, TextChangedEventArgs e)
         {
             batchSize = (int)TextBoxChanged((TextBox)sender, batchSize);
