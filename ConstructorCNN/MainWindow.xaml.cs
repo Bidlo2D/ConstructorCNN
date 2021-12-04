@@ -24,15 +24,12 @@ namespace ConstructorCNN
         private bool statusWin = true, stoped;
         private int conv, fully, percent, batchSize;
         private Tensor testImage;
-        class MyClass
-        {
-            public int Pop { get; set; } = 5;
-        }
+        private string PathData = "";
         public MainWindow()
         {
+            Network.SelectionData = new Batch();
+            Network.SelectionData.Test.Add(Converter.RandomImage(3,3,3));
             InitializeComponent();
-            ChannelComboBox.ItemsSource = Enum.GetValues(typeof(TypeChannel)).Cast<TypeChannel>();
-            ChannelComboBox.SelectedItem = Network.Channel;
             OnCreateLayerAdd(new FullyConnectInput(), StackFully, InfoGridFully, ref fully, false);
             OnCreateLayerAdd(new FullyConnectClassifier(), StackFully, InfoGridFully, ref fully, false);
         }
@@ -92,7 +89,8 @@ namespace ConstructorCNN
         }
         private void Button_Start(object sender, RoutedEventArgs e)
         {
-            On_Off(false, StartB, ConstructNetGrid, TabData, EpothsBox, ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB);
+            On_Off(false, StartB, ConstructNetGrid, TabData, EpothsBox, CheckDrop,
+                ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB, TabTesting);
             stoped = false;
             StatusBox.Clear();
             PointsTrain.Clear();
@@ -109,38 +107,34 @@ namespace ConstructorCNN
             else
             {
                 StatusBox.AppendText("Error - No data!");
-                On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB);
+                On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, CheckDrop,
+                    ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB, TabTesting);
             }
         }
         private void TheardTrain()
         {
-            //try
-            //{
+            try
+            {
                 for (int i = 0; i < Network.Epoth; i++)
                 {
-                    (int, double) result = Train();
-                    //Status by one epoch train
+                    (int, double) resultTrain = Train();//Train network
+                    (int, double) resultTest = Test();//Test selection
+                    //Statistic
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        StatusBox.AppendText($"Epoth - {i + 1}, Loss - {Math.Round(result.Item2, 6)}, Count right - {result.Item1}\n");
-                        PointsTrain.Add(new DataPoint(i + 1, Convert.ToDouble(Network.Loss)));
-                        ChartsLoss.Series[0].ItemsSource = PointsTrain;
+                        StatusBox.AppendText($"Epoth - {i + 1}, Loss - {Math.Round(resultTrain.Item2, 7)}({Math.Round(resultTest.Item2, 7)}), Count right - {resultTrain.Item1}({resultTest.Item1})\n");
+                        PointsTrain.Add(new DataPoint(i + 1, Convert.ToDouble(Network.Loss)));//Train point
+                        PointsTest.Add(new DataPoint(i + 1, Convert.ToDouble(resultTest.Item2)));//Test point
+                        ChartsLoss.Series[0].ItemsSource = PointsTrain;//Train
+                        ChartsLoss.Series[1].ItemsSource = PointsTest;//Test
                         ChartsLoss.InvalidatePlot();
                         EpothProgress.Value++;
                         StatusBox.ScrollToEnd();
                     }));
-                    double lossTest = Test();
-                    //Statistic test
-                    Dispatcher.Invoke(new Action(() =>
-                    {
-                        PointsTest.Add(new DataPoint(i + 1, Convert.ToDouble(lossTest)));
-                        ChartsLoss.Series[1].ItemsSource = PointsTest;
-                        ChartsLoss.InvalidatePlot();
-                    }));
                     if (stoped) { break; }
                     Thread.Sleep(5);
                 }
-/*            }
+            }
             catch (Exception e)
             {
                 Dispatcher.Invoke(new Action(() =>
@@ -149,19 +143,21 @@ namespace ConstructorCNN
                     StatusBox.AppendText($"Error! - {e.Message}\n");
                     StatusBox.ScrollToEnd();
                 }));
-            }*/
+            }
             //End
             Dispatcher.Invoke(new Action(() =>
             {
                 EpothProgress.Value = EpothProgress.Minimum;
                 BatchBar.Value = BatchBar.Minimum;
                 MinibatchBar.Value = MinibatchBar.Minimum;
-                On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB);
+                On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, CheckDrop,
+                    ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB, TabTesting);
             }));
         }
-        private double Test()
+        private (int , double) Test()
         {
             //Test
+            int CountRight = 0;
             double AvgLossTest = 0;
             Dispatcher.Invoke(new Action(() => {
                 MinibatchBar.Maximum = Network.SelectionData.Test.Count;
@@ -172,10 +168,11 @@ namespace ConstructorCNN
                 Network.ForwardNet(image);
                 Network.BackNoRefresh(image);
                 AvgLossTest += Network.Loss;
+                if (Network.Answer == image.Right) { CountRight++; }
                 Dispatcher.Invoke(new Action(() =>
                 { MinibatchBar.Value++; }));
             }
-            return AvgLossTest / Network.SelectionData.Test.Count;
+            return (CountRight, AvgLossTest / Network.SelectionData.Test.Count);
         }
         private (int, double) Train()
         {
@@ -230,29 +227,18 @@ namespace ConstructorCNN
         {
             stoped = true;
         }
-        private void Button_Browse(object sender, RoutedEventArgs e)
+        private void ChangeModeColor()
         {
-            string PathData = "";
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
-            {
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    PathData = dialog.SelectedPath.ToString();
-                    IsEnabled = false;
-                }
-            }
+            IsEnabled = false;
             new Thread(() =>
             {
                 if (!String.IsNullOrEmpty(PathData))
                 { BrowseImages(PathData, StackImagesTest, StackImagesTrain); }
+                else { Dispatcher.Invoke(() => { IsEnabled = true; }); }
             }).Start();
         }
-        private void BrowseImages(string PathData, StackPanel panelTrain, StackPanel panelTest)
+        private void ImageCreate(StackPanel panelTrain, StackPanel panelTest)
         {
-            Dispatcher.Invoke(new Action(() =>
-            { panelTrain.Children.Clear(); panelTest.Children.Clear(); }));
-            Network.SelectionData = new Batch(PathData, batchSize, percent);//DirImagesToTensor(PathData);
-            //DataBar.Maximum = Network.SelectionData.dataSet.Count;
             foreach (var mass in Network.SelectionData.Batches)
             {
                 foreach (var image in mass)
@@ -385,6 +371,7 @@ namespace ConstructorCNN
         {
             ComboBox a = (ComboBox)sender;
             Network.Channel = (TypeChannel)a.SelectedItem;
+            ChangeModeColor();
         }
         private void TextBox_EpothChanged(object sender, TextChangedEventArgs e)
         {
@@ -435,13 +422,120 @@ namespace ConstructorCNN
                 }
             }
         }
-
         private void TestingB_Click(object sender, RoutedEventArgs e)
         {
             Network.ForwardNet(testImage);
             ResultTestingBox.Text = $"Answer = {Network.Answer}";
         }
-
+        private void Button_Browse(object sender, RoutedEventArgs e)
+        {
+            PathData = "";
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    PathData = dialog.SelectedPath.ToString();
+                    IsEnabled = false;
+                }
+            }
+            new Thread(() =>
+            {
+                Network.SelectionData = null;
+                if (!String.IsNullOrEmpty(PathData))
+                { 
+                    BrowseImages(PathData, StackImagesTest, StackImagesTrain);
+                    UpdateCount();
+                }
+                else { Dispatcher.Invoke(() => { IsEnabled = true; }); }
+            }).Start();
+        }
+        private void Load_Button_Batch(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new System.Windows.Forms.OpenFileDialog())
+            {
+                dialog.Filter = "bin files (*.bin)|*.bin";
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    PathData = dialog.FileName;
+                    IsEnabled = false;
+                }
+            }
+            new Thread(() =>
+            {
+                if (!String.IsNullOrEmpty(PathData))
+                { 
+                    BrowseImagesLoad(Converter.LoadBatch(PathData), StackImagesTest, StackImagesTrain);
+                    UpdateCount();
+                }
+                else { Dispatcher.Invoke(() => { IsEnabled = true; }); }
+            }).Start();
+        }
+        private void Save_Button_Batch(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new System.Windows.Forms.SaveFileDialog())
+            {
+                dialog.Filter = "bin files (*.bin)|*.bin";
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    PathData = dialog.FileName;
+                    //IsEnabled = false;
+                }
+            }
+            Converter.SaveBatch(PathData, Network.SelectionData);
+        }
+        private void BrowseImagesLoad(Batch batchLoad, StackPanel panelTrain, StackPanel panelTest)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            { panelTrain.Children.Clear(); panelTest.Children.Clear(); }));
+            Network.SelectionData = batchLoad;//DirImagesToTensor(PathData);
+            //DataBar.Maximum = Network.SelectionData.dataSet.Count;
+            foreach (var mass in Network.SelectionData.Batches)
+            {
+                foreach (var image in mass)
+                {
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        Image im = new Image();
+                        im.Source = new BitmapImage(new Uri(image.Path));
+                        panelTrain.Children.Add(im);
+                    }));
+                }
+            }
+            //Test
+            foreach (var image in Network.SelectionData.Test)
+            {
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    Image im = new Image();
+                    im.Source = new BitmapImage(new Uri(image.Path));
+                    panelTest.Children.Add(im);
+                }));
+            }
+            Dispatcher.Invoke(new Action(() =>
+            { IsEnabled = true; }));
+        }
+        private void BrowseImages(string PathData, StackPanel panelTrain, StackPanel panelTest)
+        {
+            Dispatcher.Invoke(new Action(() => { panelTrain.Children.Clear(); panelTest.Children.Clear(); }));
+            if (Network.SelectionData != null && Network.SelectionData.dataSet != null) { PathData = Network.SelectionData.dataSet[0].DirPath; }
+            if (!String.IsNullOrEmpty(PathData))
+            { Network.SelectionData = new Batch(PathData, batchSize, percent); ImageCreate(panelTrain, panelTest); }
+            else
+            {
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    StatusReset.Text = "Error!";
+                }));
+            }
+        }
+        private void UpdateCount()
+        {
+            Dispatcher.Invoke(() => 
+            {
+                CountTrainBox.Content = $"{Network.SelectionData.Batches.Sum(x => x.Length)}";
+                CountTestBox.Content = $"{Network.SelectionData.Test.Count}";
+            });
+        }
         private void TextBox_BatchSizeChanged(object sender, TextChangedEventArgs e)
         {
             batchSize = (int)TextBoxChanged((TextBox)sender, batchSize);
