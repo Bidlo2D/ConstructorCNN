@@ -27,6 +27,8 @@ namespace ConstructorCNN
         private string PathData = "";
         public MainWindow()
         {
+            Network.SelectionData = new Batch();
+            Network.SelectionData.Test.Add(Converter.RandomImage(3,3,3));
             InitializeComponent();
             OnCreateLayerAdd(new FullyConnectInput(), StackFully, InfoGridFully, ref fully, false);
             OnCreateLayerAdd(new FullyConnectClassifier(), StackFully, InfoGridFully, ref fully, false);
@@ -415,11 +417,6 @@ namespace ConstructorCNN
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(dialog.FileName);
-                    if(Network.CountConv != 0)
-                    {
-                        int x = Network.InputImageSize;
-                        bitmap = new System.Drawing.Bitmap(bitmap, new System.Drawing.Size(x, x));
-                    }
                     testImage = new Tensor(bitmap, Network.Channel, 0, dialog.FileName);
                     ImageTest.Source = new BitmapImage(new Uri(testImage.Path));
                 }
@@ -427,19 +424,8 @@ namespace ConstructorCNN
         }
         private void TestingB_Click(object sender, RoutedEventArgs e)
         {
-            if(testImage != null)
-            {
-                try
-                {
-                    Network.ForwardNet(testImage);
-                    ResultTestingBox.Text = $"Answer = {Network.Answer}";
-                }
-                catch (Exception error)
-                {
-                    ResultTestingBox.Text = $"Error - {error.Message}";
-                }
-            }
-            else { ResultTestingBox.Text = $"No data!"; }
+            Network.ForwardNet(testImage);
+            ResultTestingBox.Text = $"Answer = {Network.Answer}";
         }
         private void Button_Browse(object sender, RoutedEventArgs e)
         {
