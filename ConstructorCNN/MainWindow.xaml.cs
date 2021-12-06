@@ -105,8 +105,16 @@ namespace ConstructorCNN
             else
             {
                 StatusBox.AppendText("Error - No data!");
-                On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, CheckDrop,
-                    ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB, TabTesting);
+                if ((bool)CheckDrop.IsChecked) 
+                {
+                    On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, CheckDrop,
+                          ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB, TabTesting);
+                }
+                else
+                {
+                    On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, CheckDrop,
+                    LearnRatioBox, RatioBoxA, SaveB, LoadB, TabTesting);
+                }
             }
         }
         private void TheardTrain()
@@ -148,8 +156,16 @@ namespace ConstructorCNN
                 EpothProgress.Value = EpothProgress.Minimum;
                 BatchBar.Value = BatchBar.Minimum;
                 MinibatchBar.Value = MinibatchBar.Minimum;
-                On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, CheckDrop,
-                    ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB, TabTesting);
+                if ((bool)CheckDrop.IsChecked)
+                {
+                    On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, CheckDrop,
+                          ProbabilityBox, LearnRatioBox, RatioBoxA, SaveB, LoadB, TabTesting);
+                }
+                else
+                {
+                    On_Off(true, StartB, ConstructNetGrid, TabData, EpothsBox, CheckDrop,
+                    LearnRatioBox, RatioBoxA, SaveB, LoadB, TabTesting);
+                }
             }));
         }
         private (int , double) Test()
@@ -549,6 +565,28 @@ namespace ConstructorCNN
                 CountTrainBox.Content = $"{Network.SelectionData.Batches.Sum(x => x.Length)}";
                 CountTestBox.Content = $"{Network.SelectionData.Test.Count}";
             });
+        }
+        private void CheckDrop_Checked(object sender, RoutedEventArgs e)
+        {
+            if (CheckNullMass(LabelProbability, ProbabilityBox))
+            {
+                On_Off(true, LabelProbability, ProbabilityBox);
+            }
+        }
+        private void CheckDrop_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (CheckNullMass(LabelProbability, ProbabilityBox))
+            {
+                On_Off(false, LabelProbability, ProbabilityBox);
+            }
+        }
+        private bool CheckNullMass(params FrameworkElement[] controls)
+        {
+            foreach(var c in controls) 
+            { 
+                if(c == null) { return false; }
+            }
+            return true;
         }
         private void TextBox_BatchSizeChanged(object sender, TextChangedEventArgs e)
         {
