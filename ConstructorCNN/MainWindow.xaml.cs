@@ -128,7 +128,7 @@ namespace ConstructorCNN
                     //Statistic
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        StatusBox.AppendText($"Epoth - {i + 1}, Loss - {Math.Round(resultTrain.Item2, 7)}({Math.Round(resultTest.Item2, 7)}), Count right - {resultTrain.Item1}({resultTest.Item1})\n");
+                        StatusBox.AppendText($"Epoth->{i + 1}, Loss->{Math.Round(resultTrain.Item2, 7)}({Math.Round(resultTest.Item2, 7)}), Rights->{resultTrain.Item1}({resultTest.Item1})\n");
                         PointsTrain.Add(new DataPoint(i + 1, Convert.ToDouble(Network.Loss)));//Train point
                         PointsTest.Add(new DataPoint(i + 1, Convert.ToDouble(resultTest.Item2)));//Test point
                         ChartsLoss.Series[0].ItemsSource = PointsTrain;//Train
@@ -248,11 +248,12 @@ namespace ConstructorCNN
             {
                 if (!String.IsNullOrEmpty(PathData))
                 { BrowseImages(PathData, StackImagesTest, StackImagesTrain); }
-                else { Dispatcher.Invoke(() => { IsEnabled = true; }); }
+                Dispatcher.Invoke(() => { IsEnabled = true; });
             }).Start();
         }
         private void ImageCreate(StackPanel panelTrain, StackPanel panelTest)
         {
+            Dispatcher.Invoke(new Action(() => { panelTrain.Children.Clear(); }));
             foreach (var mass in Network.SelectionData.Batches)
             {
                 foreach (var image in mass)
@@ -266,6 +267,7 @@ namespace ConstructorCNN
                 }
             }
             //Test
+            Dispatcher.Invoke(new Action(() => { panelTest.Children.Clear(); }));
             foreach (var image in Network.SelectionData.Test)
             {
                 Dispatcher.Invoke(new Action(() =>
@@ -422,6 +424,21 @@ namespace ConstructorCNN
         private void TextBox_PercentChanged(object sender, TextChangedEventArgs e)
         {
             percent = (int)TextBoxChanged((TextBox)sender, percent);
+            ChangePercentBox(percent);
+        }
+        private void ChangePercentBox(int newValue)
+        {
+            IsEnabled = false;
+            new Thread(() =>
+            {
+                if(Network.SelectionData != null)
+                {
+                    Network.SelectionData.Percent = newValue;
+                    ImageCreate(StackImagesTest, StackImagesTrain);
+                    UpdateCount();
+                }
+                Dispatcher.Invoke(() => { IsEnabled = true; });
+            }).Start();
         }
         private void BrowseTestB_Click(object sender, RoutedEventArgs e)
         {
@@ -470,9 +487,10 @@ namespace ConstructorCNN
             }
             new Thread(() =>
             {
-                Network.SelectionData = null;
+                //Network.SelectionData = null;
                 if (!String.IsNullOrEmpty(PathData))
-                { 
+                {
+                    Network.SelectionData = null;
                     BrowseImages(PathData, StackImagesTest, StackImagesTrain);
                     UpdateCount();
                 }
@@ -507,11 +525,11 @@ namespace ConstructorCNN
                 dialog.Filter = "bin files (*.bin)|*.bin";
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    PathData = dialog.FileName;
-                    //IsEnabled = false;
+                    if (Network.SelectionData != null)
+                    { Converter.SaveBatch(dialog.FileName, Network.SelectionData); }
+                    else { MessageBox.Show("The save did not happen, no data!"); }
                 }
             }
-            Converter.SaveBatch(PathData, Network.SelectionData);
         }
         private void BrowseImagesLoad(Batch batchLoad, StackPanel panelTrain, StackPanel panelTest)
         {
@@ -549,7 +567,7 @@ namespace ConstructorCNN
             Dispatcher.Invoke(new Action(() => { panelTrain.Children.Clear(); panelTest.Children.Clear(); }));
             if (Network.SelectionData != null && Network.SelectionData.dataSet != null) { PathData = Network.SelectionData.dataSet[0].DirPath; }
             if (!String.IsNullOrEmpty(PathData))
-            { Network.SelectionData = new Batch(PathData, batchSize, percent); ImageCreate(panelTrain, panelTest); }
+            { Network.SelectionData = new Batch(PathData, batchSize, percent); ImageCreate(panelTrain, panelTest); UpdateCount(); }
             else
             {
                 Dispatcher.Invoke(new Action(() =>
@@ -562,8 +580,8 @@ namespace ConstructorCNN
         {
             Dispatcher.Invoke(() => 
             {
-                CountTrainBox.Content = $"{Network.SelectionData.Batches.Sum(x => x.Length)}";
-                CountTestBox.Content = $"{Network.SelectionData.Test.Count}";
+                CountTrainBox.Content = $"{StackImagesTrain.Children.Count}";
+                CountTestBox.Content = $"{StackImagesTest.Children.Count}";
             });
         }
         private void CheckDrop_Checked(object sender, RoutedEventArgs e)
@@ -591,6 +609,21 @@ namespace ConstructorCNN
         private void TextBox_BatchSizeChanged(object sender, TextChangedEventArgs e)
         {
             batchSize = (int)TextBoxChanged((TextBox)sender, batchSize);
+            ChangeBatchSizeBox(batchSize);
+        }
+        private void ChangeBatchSizeBox(int newValue)
+        {
+            IsEnabled = false;
+            new Thread(() =>
+            {
+                if (Network.SelectionData != null)
+                {
+                    Network.SelectionData.BatchSize = newValue;
+                    ImageCreate(StackImagesTest, StackImagesTrain);
+                    UpdateCount(); 
+                }
+                Dispatcher.Invoke(() => { IsEnabled = true; });
+            }).Start();
         }
         private void TextBox_EpothTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
