@@ -10,9 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="BackGroundCNN.jpg" />
     <None Remove="BlackPlus.png" />
-    <None Remove="IconeCNN.png" />
+    <None Remove="Images\BlackPlus.png" />
     <None Remove="Plus.png" />
   </ItemGroup>
 
@@ -33,9 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="BackGroundCNN.jpg" />
     <Resource Include="BlackPlus.png" />
-    <Resource Include="IconeCNN.png" />
+    <Resource Include="Images\BlackPlus.png" />
     <Resource Include="Plus.png" />
   </ItemGroup>
 

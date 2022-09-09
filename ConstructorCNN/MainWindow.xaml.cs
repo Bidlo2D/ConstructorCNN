@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -128,7 +129,7 @@ namespace ConstructorCNN
                     //Statistic
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        StatusBox.AppendText($"Epoth->{i + 1}, Loss->{Math.Round(resultTrain.Item2, 7)}({Math.Round(resultTest.Item2, 7)}), Rights->{resultTrain.Item1}({resultTest.Item1})\n");
+                        StatusBox.AppendText($"Epoth->{i + 1}, Loss->{resultTrain.Item2}({Math.Round(resultTest.Item2, 7)}), Rights->{resultTrain.Item1}({resultTest.Item1})\n");
                         PointsTrain.Add(new DataPoint(i + 1, Convert.ToDouble(Network.Loss)));//Train point
                         PointsTest.Add(new DataPoint(i + 1, Convert.ToDouble(resultTest.Item2)));//Test point
                         ChartsLoss.Series[0].ItemsSource = PointsTrain;//Train
@@ -138,7 +139,7 @@ namespace ConstructorCNN
                         StatusBox.ScrollToEnd();
                     }));
                     if (stoped) { break; }
-                    Thread.Sleep(5);
+                    Thread.Sleep(1);
                 }
             }
             catch (Exception e)
@@ -168,7 +169,7 @@ namespace ConstructorCNN
                 }
             }));
         }
-        private (int , double) Test()
+        private (int, double) Test()
         {
             //Test
             int CountRight = 0;
@@ -262,7 +263,7 @@ namespace ConstructorCNN
                     {
                         Image im = new Image();
                         im.Source = new BitmapImage(new Uri(image.Path));
-                        panelTrain.Children.Add(im);
+                        panelTrain.Children.Add(im); 
                     }));
                 }
             }
@@ -465,7 +466,7 @@ namespace ConstructorCNN
                 try
                 {
                     Network.ForwardNet(testImage);
-                    ResultTestingBox.Text = $"Answer = {Network.Answer}";
+                    ResultTestingBox.Text = $"Answer = {Network.Answer}, Confidence - {Network.Confidence}%";
                 }
                 catch (Exception error)
                 {
@@ -533,10 +534,15 @@ namespace ConstructorCNN
         }
         private void BrowseImagesLoad(Batch batchLoad, StackPanel panelTrain, StackPanel panelTest)
         {
+            Network.SelectionData = batchLoad;
             Dispatcher.Invoke(new Action(() =>
-            { panelTrain.Children.Clear(); panelTest.Children.Clear(); }));
-            Network.SelectionData = batchLoad;//DirImagesToTensor(PathData);
-            //DataBar.Maximum = Network.SelectionData.dataSet.Count;
+            { 
+                panelTrain.Children.Clear(); 
+                panelTest.Children.Clear();
+                PercentBox.Text = Network.SelectionData.Percent.ToString();
+                BatchSizeBox.Text = Network.SelectionData.BatchSize.ToString();
+                ChannelComboBox.SelectedIndex = Network.SelectionData.dataSet[0].SizeZ - 1;
+            }));
             foreach (var mass in Network.SelectionData.Batches)
             {
                 foreach (var image in mass)

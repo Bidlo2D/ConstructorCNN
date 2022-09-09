@@ -121,7 +121,7 @@
                         <Button ch:Name="ResetB" Content="Reset" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Height="82" Width="80" Foreground="#FF47C961" Click="Button_Reset" BorderBrush="Black" IsCancel="True"/>
                         <Button ch:Name="BrowseB_Copy" Content="Browse" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" Width="100" Click="Button_Browse" Height="35"/>
                         <Label Content="Percent test:" Margin="115,94,108,768"/>
-                        <TextBox ch:Name="PercentBox" HorizontalAlignment="Left" Margin="248,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="83" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" TextChanged="TextBox_PercentChanged" PreviewTextInput="TextBox_RatioTextInput"/>
+                        <TextBox ch:Name="PercentBox" HorizontalAlignment="Left" Margin="248,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="83" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" TextChanged="TextBox_PercentChanged" PreviewTextInput="TextBox_EpothTextInput" Text="30"/>
                         <Label Content="Batch size:" Margin="341,94,242,768" Grid.ColumnSpan="2"/>
                         <TextBox ch:Name="BatchSizeBox" HorizontalAlignment="Left" Margin="103,98,0,0" Text="50" TextWrapping="Wrap" VerticalAlignment="Top" Width="83" Background="{ch:Null}" BorderBrush="Black" BorderThickness="0,0,0,1" TextChanged="TextBox_BatchSizeChanged" Grid.Column="1" PreviewTextInput="TextBox_EpothTextInput"/>
                         <ScrollViewer ch:Name="Scroll_Test" BorderBrush="#FF5D5050" Margin="10,169,10,52" Width="330">
@@ -153,7 +153,7 @@
                 <TabItem ch:Name="TabTesting" Header="Testing">
                     <Grid>
                         <Button ch:Name="BrowseTestB" Content="Browse" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="#FF4473D8" Click="BrowseTestB_Click"/>
-                        <TextBox ch:Name="ResultTestingBox" Margin="80,10,80,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="29"/>
+                        <TextBox ch:Name="ResultTestingBox" Margin="80,10,80,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="29" IsReadOnly="True"/>
                         <Image ch:Name="ImageTest" Margin="10,49,10,10"/>
                         <Button ch:Name="TestingB" Content="Test" Margin="0,10,10,0" VerticalAlignment="Top" Foreground="#FF409968" Click="TestingB_Click" HorizontalAlignment="Right" Width="65"/>
                     </Grid>
@@ -163,7 +163,7 @@
         <Button x:Name="Exit" Content="X" HorizontalAlignment="Right" Width="45" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" FontFamily="Comic Sans MS" FontSize="20" FontWeight="Bold" Click="Button_Click_1" Height="43" VerticalAlignment="Top" Margin="0,6,6,0"/>
         <Button x:Name="Expand" Content="@" HorizontalAlignment="Right" Margin="0,6,56,0" Width="44" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" FontFamily="Comic Sans MS" FontSize="20" FontWeight="Bold" Height="43" VerticalAlignment="Top" Click="Button_Click_2"/>
         <Button x:Name="RollUp" Content="-" HorizontalAlignment="Right" Margin="0,5,105,0" Width="46" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" FontFamily="Comic Sans MS" FontSize="20" FontWeight="Bold" Click="Button_Click" Height="43" VerticalAlignment="Top"/>
-        <Image HorizontalAlignment="Left" Height="56" VerticalAlignment="Top" Width="64" Source="/IconeCNN.png" Stretch="Fill" StretchDirection="Both"/>
+        <Image HorizontalAlignment="Left" Height="56" VerticalAlignment="Top" Width="64" Source="Images/IconeCNN.png" Stretch="Fill" StretchDirection="Both"/>
         <Label Content="Welcome to the Construct CNN!" Margin="76,10,0,0" Foreground="White" FontSize="18" FontFamily="Comic Sans MS" FontWeight="Bold" FontStyle="Normal" BorderThickness="0,0,0,2" BorderBrush="White" HorizontalAlignment="Left" Width="300" Height="33" VerticalAlignment="Top"/>
     </Grid>
 </Window>
