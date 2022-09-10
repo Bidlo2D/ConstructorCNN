@@ -26,9 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="LibraryCNN">
-      <HintPath>..\..\LibraryCNN\LibraryCNN\bin\Debug\net5.0\LibraryCNN.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\LibraryCNN\LibraryCNN\LibraryCNN.csproj" />
   </ItemGroup>
 
   <ItemGroup>
