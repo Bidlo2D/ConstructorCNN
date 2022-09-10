@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryCNN", "..\LibraryCNN\LibraryCNN\LibraryCNN.csproj", "{BEFA0849-A75E-49B3-9032-7DF8F69F95C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryCNN", "LibraryCNN\LibraryCNN\LibraryCNN.csproj", "{8A73172F-8205-4B73-8D9D-C2E4C700F34D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,10 +22,10 @@ Global
 		{5C982C4A-81D8-4585-97A1-41A65733EDAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C982C4A-81D8-4585-97A1-41A65733EDAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C982C4A-81D8-4585-97A1-41A65733EDAD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BEFA0849-A75E-49B3-9032-7DF8F69F95C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BEFA0849-A75E-49B3-9032-7DF8F69F95C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BEFA0849-A75E-49B3-9032-7DF8F69F95C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BEFA0849-A75E-49B3-9032-7DF8F69F95C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A73172F-8205-4B73-8D9D-C2E4C700F34D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A73172F-8205-4B73-8D9D-C2E4C700F34D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A73172F-8205-4B73-8D9D-C2E4C700F34D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A73172F-8205-4B73-8D9D-C2E4C700F34D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
