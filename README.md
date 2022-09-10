@@ -1,1 +1,1 @@
-# ConstructorCNN
+# ConstructorCNN - Microsoft Visual Studio WPF.
